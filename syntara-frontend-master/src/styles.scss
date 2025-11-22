@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@600;700&family=Poppins:wght@400;500;600&display=swap');
+
+/*Fuentes por defecto*/
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+h1, h2, h3 {
+  font-family: 'Cabin', sans-serif;
+}
+
+app-payment {
+  .form-input {
+    text-align: left !important;
+  }
+  .card-details-row {
+    &::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+  }
+  .expiry-field {
+    float: left !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    padding-right: 10px !important;
+  }
+
+  .cvc-field {
+    float: left !important;
+    width: 69% !important;
+    box-sizing: border-box;
+    padding-left: 10px !important;
+  }
+}

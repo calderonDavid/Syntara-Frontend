@@ -1,0 +1,30 @@
+<div class="form-container">
+  <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+    <h2>Iniciar Sesión</h2>
+    <div class="form-field">
+      <label for="login-correo">Correo Electrónico</label>
+      <input id="login-correo" type="email" formControlName="correo" placeholder="tu@correo.com">
+    </div>
+    <div class="form-field">
+      <label for="login-contrasena">Contraseña</label>
+      <div class="password-wrapper">
+        <input
+          id="login-contrasena"
+          [type]="loginPasswordVisible ? 'text' : 'password'"
+          formControlName="contrasena">
+        <button type="button" (click)="toggleLoginPass()" class="password-toggle-btn">
+          {{ loginPasswordVisible ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+    </div>
+    <div *ngIf="loginError" class="error-message">
+      {{ loginError }}
+    </div>
+    <button type="submit" class="form-button" [disabled]="loginForm.invalid">Entrar</button>
+    <p class="form-link">
+    <p class="form-link">
+      ¿No tienes cuenta? <a routerLink="/register">Regístrate aquí</a>
+    </p>
+  </form>
+</div>
+<div class="footer">Syntara • Los precios hablan, Syntara escucha. ©</div>

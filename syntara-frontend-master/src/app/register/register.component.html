@@ -1,0 +1,56 @@
+<div class="form-container">
+  <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
+    <h2>Crear Cuenta</h2>
+    <div class="form-field">
+      <label for="reg-nombre">Nombre</label>
+      <input id="reg-nombre" type="text" formControlName="nombre">
+    </div>
+    <div class="form-field">
+      <label for="reg-apellido">Apellido</label>
+      <input id="reg-apellido" type="text" formControlName="apellido">
+    </div>
+    <div class="form-field">
+      <label for="reg-correo">Correo Electrónico</label>
+      <input id="reg-correo" type="email" formControlName="correo">
+    </div>
+    <div class="form-field">
+      <label for="reg-contrasena">Contraseña</label>
+      <div class="password-wrapper">
+        <input
+          id="reg-contrasena"
+          [type]="registerPasswordVisible ? 'text' : 'password'"
+          formControlName="contrasena">
+        <button type="button" (click)="toggleRegPass()" class="password-toggle-btn">
+          {{ registerPasswordVisible ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+    </div>
+    <div class="form-field">
+      <label for="reg-verificar">Verificar Contraseña</label>
+      <div class="password-wrapper">
+        <input
+          id="reg-verificar"
+          [type]="registerVerifyVisible ? 'text' : 'password'"
+          formControlName="verificarContrasena">
+        <button type="button" (click)="toggleRegVerify()" class="password-toggle-btn">
+          {{ registerVerifyVisible ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+      <div
+        *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('verificarContrasena')?.touched"
+        class="error-message">
+        Las contraseñas no coinciden.
+      </div>
+    </div>
+    <div *ngIf="registerError" class="error-message">
+      {{ registerError }}
+    </div>
+    <button type="submit" class="form-button" [disabled]="registerForm.invalid">Crear Cuenta</button>
+    <p class="form-link">
+      ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión aquí</a>
+    </p>
+  </form>
+</div>
+<footer class="footer">
+  Syntara • Los precios hablan, Syntara escucha. ©
+</footer>

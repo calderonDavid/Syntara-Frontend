@@ -1,0 +1,154 @@
+:host {
+  .form-input {
+    text-align: left !important;
+  }
+
+  .card-details-row {
+    display: grid !important;
+    grid-template-columns: 2fr 1fr !important;
+    gap: 20px !important;
+  }
+}
+
+.payment-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 80px 20px;
+  min-height: calc(100vh - 80px);
+  box-sizing: border-box;
+}
+
+.form-container {
+  max-width: 550px;
+  width: 100%;
+  padding: 40px 50px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 45px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  box-sizing: border-box;
+}
+
+h2 {
+  font-family: 'Cabin', sans-serif;
+  color: #004b3a;
+  font-size: 36px;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.payment-intro {
+  text-align: center;
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 35px;
+  line-height: 1.5;
+}
+
+.form-field {
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-weight: 600;
+    color: #004b3a;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+.form-input {
+  height: 55px;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  padding: 0 20px;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #fff;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #54a78b;
+    box-shadow: 0 0 8px rgba(84, 167, 139, 0.4);
+  }
+}
+
+.payment-button {
+  width: 100%;
+  height: 60px;
+  margin-top: 10px;
+  background-color: #54a78b;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+
+  &:hover {
+    background-color: #4a9479;
+  }
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 25px;
+  color: #004b3a;
+  text-decoration: none;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  // Añadimos una animación suave
+  animation: fadeIn 0.3s ease-out;
+}
+
+.success-message {
+  background-color: white;
+  padding: 35px 50px;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+
+  h3 {
+    font-family: 'Cabin', sans-serif;
+    color: #004b3a;
+    font-size: 28px;
+    margin-top: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

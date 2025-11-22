@@ -1,0 +1,144 @@
+.subscription-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  padding: 60px 40px 40px;
+  font-family: 'Poppins', sans-serif;
+  background: none !important;
+}
+
+.main-logo-section {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 40px;
+  padding: 25px 40px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  margin-bottom: 50px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.main-logo {
+  width: 300px;
+  height: auto;
+  display: block;
+}
+
+.plans-container {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 50px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.plan-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid #54a78b;
+  border-radius: 40px;
+  padding: 40px 45px;
+  width: 380px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+
+  &:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 12px 35px rgba(84, 167, 139, 0.25);
+  }
+
+  h3 {
+    font-family: 'Rubik', sans-serif;
+    font-size: 28px;
+    color: #1a2b3c;
+    margin-bottom: 10px;
+  }
+
+  .price {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 25px;
+  }
+
+  .benefits {
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    color: #333;
+    text-align: left;
+    padding: 0 10px;
+    font-weight: 500;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 15px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        transition: background 0.2s ease;
+
+        &:hover {
+          background: rgba(84, 167, 139, 0.15);
+        }
+      }
+    }
+  }
+
+  .plan-subscribe-btn {
+    background: linear-gradient(135deg, #54a78b, #7fd0b3);
+    color: white;
+    border: 2px solid #54a78b;
+    border-radius: 40px;
+    padding: 14px 35px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: 25px;
+    display: inline-block;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 18px rgba(84, 167, 139, 0.4);
+    }
+  }
+}
+
+.plan-card.enterprise {
+  border: 2px solid #54a78b;
+  box-shadow: 0 10px 35px rgba(84, 167, 139, 0.25);
+
+  h3 {
+    color: #1a2b3c;
+  }
+
+  .price {
+    color: #004b3a;
+  }
+
+  .plan-subscribe-btn {
+    background: linear-gradient(135deg, #63d4a3, #54a78b);
+
+    &:hover {
+      box-shadow: 0 8px 25px rgba(99, 212, 163, 0.5);
+    }
+  }
+}
+
+.footer {
+  text-align: center;
+  padding-top: 50px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+}

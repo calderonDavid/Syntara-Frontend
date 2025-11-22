@@ -1,0 +1,39 @@
+<div class="payment-container">
+  <div class="form-container">
+    <h2>Finalizar Suscripción</h2>
+    <p class="payment-intro">
+      Estás a un paso de acceder a toda la información de Syntara.
+      Tu plan será cargado por $XX al mes.
+    </p>
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label for="cardName">Nombre en la Tarjeta</label>
+        <input id="cardName" type="text" class="form-input" placeholder="Nombre Apellido">
+      </div>
+      <div class="form-field">
+        <label for="cardNumber">Número de Tarjeta</label>
+        <input id="cardNumber" type="text" class="form-input" placeholder="XXXX XXXX XXXX XXXX">
+      </div>
+      <div class="card-details-row">
+        <div class="form-field expiry-field">
+          <label for="cardExpiry">Expira (MM/AA)</label>
+          <input id="cardExpiry" type="text" class="form-input" placeholder="MM/AA">
+        </div>
+        <div class="form-field cvc-field">
+          <label for="cardCVC">CVC/CVV</label>
+          <input id="cardCVC" type="text" class="form-input" placeholder="123">
+        </div>
+      </div>
+      <button type="submit" class="payment-button">
+        Pagar $XX y Suscribirse
+      </button>
+      <a routerLink="/suscription" class="back-link">Volver a los planes</a>
+    </form>
+  </div>
+</div>
+<div *ngIf="showSuccessMessage" class="success-overlay">
+  <div class="success-message">
+    <h3>¡Pago Exitoso!</h3>
+    <p>Gracias por suscribirte a Syntara. Serás redirigido al inicio...</p>
+  </div>
+</div>

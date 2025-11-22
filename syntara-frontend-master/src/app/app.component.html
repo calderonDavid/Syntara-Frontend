@@ -1,0 +1,47 @@
+<header class="header">
+  <div class="header-left">
+    <a *ngIf="currentUser && showHeaderLinks"
+       routerLink="/history"
+       class="nav-link history-icon-button"
+       aria-label="Ver historial">
+      <img src="assets/images/historial.png" alt="Historial" class="history-icon-img">
+      <span class="tooltip">Ver historial</span>
+    </a>
+    <div class="logo-container">
+      <img
+        src="assets/images/logopequ.png"
+        alt="Syntara Logo"
+        class="header-logo header-home-button"
+        routerLink="/">
+      <span class="header-title" routerLink="/">Syntara</span>
+    </div>
+  </div>
+  <nav class="navigation">
+    <a *ngIf="showHeaderLinks && (!currentUser || (currentUser && !currentUser.isSubscribed))"
+       routerLink="/subscription"
+       class="nav-link">
+      Suscríbete
+    </a>
+    <a *ngIf="showHeaderLinks && !currentUser"
+       routerLink="/login"
+       class="nav-link">
+      Iniciar Sesión
+    </a>
+    <div *ngIf="showHeaderLinks && currentUser" class="user-actions" style="display:flex; gap:10px; align-items:center;">
+      <button (click)="logout()" class="nav-link" style="cursor:pointer; border: 1px solid rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.25);">
+        Salir
+      </button>
+    </div>
+  </nav>
+</header>
+
+<div [@routeAnimations]="getRouteAnimationData()">
+  <router-outlet></router-outlet>
+</div>
+
+<div *ngIf="isLoading" class="logout-overlay">
+  <div class="spinner-container">
+    <div class="spinner"></div>
+    <p>Cerrando sesión...</p>
+  </div>
+</div>

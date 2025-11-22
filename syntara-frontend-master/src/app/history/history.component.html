@@ -1,0 +1,76 @@
+<main class="history-container">
+  <h2>Mi Historial de Búsqueda</h2>
+  <div *ngIf="isLoadingHistory" class="loading-indicator">
+    <p>Cargando tu historial...</p>
+  </div>
+  <div *ngIf="!isLoadingHistory && historyError" class="error-message">
+    <p>{{ historyError }}</p>
+  </div>
+  <div class="results-table-container" *ngIf="!isLoadingHistory && !historyError && searchHistory.length > 0">
+    <table class="results-table">
+      <thead>
+      <tr>
+        <th>PRODUCTO</th>
+        <th>CANTIDAD</th>
+        <th>FECHA</th>
+        <th>TIENDA</th>
+        <th class="actions-header">ACCIONES</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let item of searchHistory">
+        <td class="store-name">{{ item.product }}</td>
+        <td class="unit-price-col">
+          <span class="unit-price-label">{{ item.quantity }}</span>
+          <span class="unit-price-value" style="font-size: 16px; margin-left: 8px;">{{ item.unit }}</span>
+        </td>
+        <td>{{ item.date | date:'mediumDate' }}</td>
+        <td class="url-cell">
+          <a *ngIf="item.url" [href]="item.url" target="_blank" class="history-link" title="Ir al sitio">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            Ver sitio
+          </a>
+          <span *ngIf="!item.url" class="no-link">-</span>
+        </td>
+
+        <td class="actions-cell">
+          <button (click)="onSearchAgain(item)" class="action-btn search-btn" title="Volver a buscar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </button>
+          <button (click)="requestDeleteItem(item)" class="action-btn delete-btn" title="Eliminar registro">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div *ngIf="!isLoadingHistory && !historyError && searchHistory.length === 0" class="no-results">
+    <p>Aún no tienes búsquedas en tu historial.</p>
+  </div>
+  <div class="bottom-actions">
+    <button
+      *ngIf="!isLoadingHistory && !historyError && searchHistory.length > 0"
+      (click)="requestClearAll()"
+      class="clear-history-btn">
+      Borrar todo el historial
+    </button>
+    <a routerLink="/" class="back-link">Volver al Inicio</a>
+  </div>
+  <div *ngIf="showConfirmModal" class="modal-overlay">
+    <div class="modal-container">
+      <ng-container *ngIf="!isClearing">
+        <h3>Confirmación</h3>
+        <p>{{ modalMessage }}</p>
+        <div class="modal-buttons">
+          <button (click)="cancelClear()" class="modal-btn cancel">Cancelar</button>
+          <button (click)="confirmClear()" class="modal-btn confirm">Aceptar</button>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="isClearing">
+        <div class="spinner"></div>
+        <p class="loading-text">Procesando...</p>
+      </ng-container>
+    </div>
+  </div>
+</main>
