@@ -8,6 +8,11 @@ import { ApiService } from '../api.service';
 import { trigger, style, transition, animate, query, stagger } from '@angular/animations';
 import { TypewriterDirective } from '../typewriter.directive';
 
+interface VolumeItem {
+  product: string;
+  quantity: number;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -55,11 +60,14 @@ export class HomeComponent implements OnInit {
   generalError: string | null = null;
   greetingName: string = '';
   resultsTitleText: string = '';
+  showVolumeModal: boolean = false;
+  volumeItems: VolumeItem[] = []; // Lista dinámica de productos
 
   // VARIABLES PARA LA NOTIFICACIÓN (TOAST)
   showToast: boolean = false;
   toastMessage: string = '';
   toastType: 'success' | 'error' = 'success';
+  isEnterpriseUser: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -71,6 +79,26 @@ export class HomeComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.greetingName = (user && user.name) ? `${user.name}` : '';
     });
+    this.checkUserPlan();
+  }
+  checkUserPlan() {
+    if (this.authService.isLoggedIn()) {
+      this.apiService.getMyPlan().subscribe({
+        next: (plan) => {
+          console.log('Plan actual:', plan);
+          // El backend devuelve el objeto suscripción. Verificamos el tipo.
+          if (plan && plan.type === 'Enterprise') {
+            this.isEnterpriseUser = true;
+          } else {
+            this.isEnterpriseUser = false;
+          }
+        },
+        error: (err) => {
+          console.error('Error verificando plan', err);
+          this.isEnterpriseUser = false; // Por defecto mostramos la búsqueda normal
+        }
+      });
+    }
   }
 
   onSearch() {
@@ -117,8 +145,6 @@ export class HomeComponent implements OnInit {
       setTimeout(() => this.router.navigate(['/login']), 1500);
       return;
     }
-
-    // 1. Convertimos y validamos
     const cleanPrice = Number(item.price);
     const cleanQuantity = Number(this.lastSearchQuantity);
 
@@ -127,10 +153,9 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    // 2. Construir payload EXACTO que llega bien al backend
     const cartItemPayload = {
-      id: item._id ?? item.id ?? null,   // 👈 garantizamos el id
-      product: item.product ?? "",       // 👈 nunca undefined
+      id: item._id ?? item.id ?? null,
+      product: item.product ?? "",
       price: cleanPrice,
       store: item.store ?? "",
       url: item.url ?? null,
@@ -140,7 +165,7 @@ export class HomeComponent implements OnInit {
 
     console.log("🚀 Enviando payload limpio:", cartItemPayload);
 
-    // 3. Enviar al backend con JSON correcto
+
     this.apiService.addToCart(cartItemPayload).subscribe({
       next: (res) => {
         this.showNotification(`¡${item.product} agregado al carrito!`, 'success');
@@ -156,15 +181,11 @@ export class HomeComponent implements OnInit {
   }
 
 
-
-
-  // --- FUNCIÓN PARA MOSTRAR EL TOAST (NOTIFICACIÓN) ---
   private showNotification(message: string, type: 'success' | 'error') {
     this.toastMessage = message;
     this.toastType = type;
     this.showToast = true;
 
-    // Ocultar automáticamente después de 3 segundos
     setTimeout(() => {
       this.showToast = false;
     }, 3000);
@@ -179,5 +200,41 @@ export class HomeComponent implements OnInit {
       'metros': 'm', 'centimetros': 'cm', 'metros_cuadrados': 'm²'
     };
     return map[fullMeasure] || fullMeasure;
+  }
+  // --- REPORTE PRECIO POR VOLUMEN ---
+  openVolumeModal() {
+    this.volumeItems = [{ product: '', quantity: 100 }]; // Iniciamos con 1 item
+    this.showVolumeModal = true;
+  }
+  closeVolumeModal() {
+    this.showVolumeModal = false;
+  }
+  addVolumeItem() {
+    this.volumeItems.push({ product: '', quantity: 100 });
+  }
+  removeVolumeItem(index: number) {
+    if (this.volumeItems.length > 1) {
+      this.volumeItems.splice(index, 1);
+    }
+  }
+  generateVolumeReport() {
+    // Validar que no haya campos vacíos
+    const isValid = this.volumeItems.every(item => item.product.trim() !== '' && item.quantity > 0);
+
+    if (!isValid) {
+      // Reutilizamos tu notificación existente para validación
+      this.showNotification('Por favor completa todos los campos de productos y cantidades.', 'error');
+      return;
+    }
+    // Obtener el correo de la sesión actual
+    const currentUser = this.authService.getCurrentUser();
+    const userEmail = currentUser ? currentUser.email : 'tu correo';
+
+    this.closeVolumeModal();
+
+    // MOSTRAR EL MENSAJE DE ÉXITO SOLICITADO
+    this.showNotification(`Su reporte fue generado y enviado a ${userEmail} con éxito`, 'success');
+
+    // (Opcional) Aquí podrías limpiar el formulario si quisieras
   }
 }

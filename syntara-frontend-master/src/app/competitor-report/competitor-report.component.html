@@ -1,0 +1,75 @@
+<main class="report-container">
+
+  <div class="header-section">
+    <a routerLink="/" class="back-btn">← Volver</a>
+    <h2>⚔️ Monitor de Competencia</h2>
+    <p>Compara tus precios históricos contra el mercado en tiempo real.</p>
+  </div>
+
+  <div class="config-card">
+    <label>Analizar tienda:</label>
+    <div class="search-row">
+      <input
+        type="text"
+        [(ngModel)]="targetStore"
+        placeholder="Ej: Exito, Jumbo, Alkosto..."
+        (keyup.enter)="generateReport()">
+
+      <button (click)="generateReport()" [disabled]="isLoading || !targetStore">
+        <span *ngIf="!isLoading">Generar Análisis</span>
+        <span *ngIf="isLoading" class="spinner-small"></span>
+      </button>
+    </div>
+    <small>Nota: El nombre debe coincidir con cómo aparece la tienda en los registros de búsqueda.</small>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading && reportData.length > 0" class="results-grid">
+
+    <div *ngIf="analysisText" class="ai-summary-card">
+      <h4>🤖 Insights de Syntara</h4>
+      <p>{{ analysisText }}</p>
+    </div>
+
+    <div class="product-card" *ngFor="let item of reportData">
+      <div class="card-header">
+        <h3>{{ item.displayProduct || item.productName }}</h3>
+        <span class="my-price-badge">
+          Tu precio: <strong>$ {{ item.myPrice | number:'1.0-0' }}</strong>
+          <br><small>{{ item.myDate | date:'shortDate' }}</small>
+        </span>
+      </div>
+
+      <div class="competitors-list">
+        <div *ngIf="item.competitors.length === 0" class="no-competitors">
+          No se encontraron datos recientes de la competencia para este producto.
+        </div>
+
+        <div *ngFor="let comp of item.competitors" class="comp-row">
+          <div class="comp-info">
+            <span class="store-name">{{ comp.store }}</span>
+            <span class="date">{{ comp.date | date:'MMM d' }}</span>
+          </div>
+
+          <div class="comp-price-box">
+            <span class="price">$ {{ comp.price | number:'1.0-0' }}</span>
+
+            <span class="badge"
+                  [class.cheaper]="comp.price < item.myPrice"
+                  [class.expensive]="comp.price > item.myPrice"
+                  [class.equal]="comp.price === item.myPrice">
+
+              <span *ngIf="comp.price < item.myPrice">▼ {{ getDifferencePercent(item.myPrice, comp.price) | number:'1.0-0' }}%</span>
+              <span *ngIf="comp.price > item.myPrice">▲ +{{ getDifferencePercent(item.myPrice, comp.price) | number:'1.0-0' }}%</span>
+              <span *ngIf="comp.price === item.myPrice">= Igual</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>

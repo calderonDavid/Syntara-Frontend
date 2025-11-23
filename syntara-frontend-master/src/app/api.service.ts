@@ -81,5 +81,20 @@ export class ApiService {
   clearCart(): Observable<any> {
     return this.http.delete(`${this.baseUrl}/cart/clear`);
   }
+  // ASIGNAR SUBCRIPCION
+  getMyPlan(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/subscriptions/my-plan`);
+  }
+  // Asignar un plan (usado en el paso anterior)
+  assignPlan(planName: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/subscriptions/assign`, { plan: planName });
+  }
+  updateUserProfile(data: { name?: string, lastname?: string }): Observable<any> {
+    return this.http.put(`${this.baseUrl}/users/update`, data);
+  }
+  //REPORTE COMPETENCIA
+  getCompetitorReport(storeName: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/reports/company-monitor`, { storeName });
+  }
 }
 

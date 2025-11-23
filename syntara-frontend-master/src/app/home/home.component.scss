@@ -673,3 +673,233 @@
     .toast-icon svg { stroke: #e74c3c; }
   }
 }
+.enterprise-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.reports-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+  max-width: 1000px;
+
+  .report-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid #54a78b;
+    border-radius: 30px;
+    width: 250px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 10px 20px rgba(84, 167, 139, 0.15);
+
+    .btn-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    span {
+      font-family: 'Rubik', sans-serif;
+      font-size: 20px;
+      color: #004b3a;
+      text-align: center;
+      padding: 0 20px;
+      font-weight: 500;
+    }
+
+    &:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 15px 30px rgba(84, 167, 139, 0.3);
+      border-color: #004b3a;
+
+      .btn-icon {
+        transform: scale(1.2);
+      }
+    }
+
+    &:active {
+      transform: translateY(-5px);
+    }
+  }
+}
+
+// Ajuste responsive para móviles
+@media (max-width: 768px) {
+  .reports-grid {
+    flex-direction: column;
+    align-items: center;
+
+    .report-btn {
+      width: 90%;
+      height: 150px;
+      flex-direction: row;
+      gap: 20px;
+
+      .btn-icon {
+        margin-bottom: 0;
+        font-size: 40px;
+      }
+    }
+  }
+}
+/* ... tus estilos existentes ... */
+
+/* --- ESTILOS DEL MODAL DE VOLUMEN --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-container {
+  background: white;
+  padding: 35px;
+  border-radius: 30px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 90%;
+  max-width: 600px; // Un poco más ancho para el formulario
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  h3 {
+    color: #004b3a;
+    font-family: 'Cabin', sans-serif;
+    font-size: 26px;
+    margin-top: 0;
+    margin-bottom: 5px;
+  }
+
+  .modal-subtitle {
+    color: #666;
+    font-size: 15px;
+    margin-bottom: 25px;
+  }
+}
+
+// Formulario dinámico
+.volume-form-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 25px;
+  padding-right: 5px; // Espacio para scrollbar
+}
+
+.volume-item-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end; // Alinear inputs abajo
+  margin-bottom: 15px;
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #004b3a;
+      margin-bottom: 5px;
+      margin-left: 10px;
+    }
+
+    input {
+      padding: 10px 15px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      outline: none;
+
+      &:focus {
+        border-color: #54a78b;
+        box-shadow: 0 0 0 2px rgba(84, 167, 139, 0.2);
+      }
+    }
+  }
+
+  .product-group { flex: 3; }
+  .quantity-group { flex: 1; }
+
+  .remove-item-btn {
+    background: #ffebee;
+    color: #d32f2f;
+    border: none;
+    width: 35px; height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 4px; // Ajuste visual
+    transition: background 0.2s;
+
+    &:hover { background: #ffcdd2; }
+  }
+}
+
+.add-row-btn {
+  background: none;
+  border: 1px dashed #54a78b;
+  color: #54a78b;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+  margin-top: 5px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #eaf7f3;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+
+  button {
+    padding: 12px 30px;
+    border-radius: 50px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s;
+
+    &:active { transform: scale(0.98); }
+  }
+
+  .cancel-btn {
+    background: #f0f0f0;
+    color: #555;
+    &:hover { background: #e0e0e0; }
+  }
+
+  .confirm-btn {
+    background: #54a78b;
+    color: white;
+    box-shadow: 0 4px 15px rgba(84, 167, 139, 0.3);
+    &:hover { background: #4a9479; }
+  }
+}

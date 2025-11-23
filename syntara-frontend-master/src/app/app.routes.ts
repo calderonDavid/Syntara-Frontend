@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import {CartComponent} from './cart/cart.component';
+import { CompetitorReportComponent } from './competitor-report/competitor-report.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
@@ -6,7 +8,7 @@ import { SubscriptionComponent } from './subscription/subscription.component';
 import { PaymentComponent } from './payment/payment.component';
 import { authGuard } from './auth.guard';
 import { HistoryComponent } from './history/history.component';
-import {CartComponent} from './cart/cart.component';
+
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, data: { animation: 'HomePage' } },
@@ -31,6 +33,12 @@ export const routes: Routes = [
     component: PaymentComponent,
     canActivate: [authGuard],
     data: { hideHeaderLinks: true, animation: 'PaymentPage' }
+  },
+  {
+    path: 'competitor-report',
+    component: CompetitorReportComponent,
+    canActivate: [authGuard],
+    data: { animation: 'ReportPage' }
   },
   {
     path: 'cart',

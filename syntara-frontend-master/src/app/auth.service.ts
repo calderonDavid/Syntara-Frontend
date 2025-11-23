@@ -66,4 +66,17 @@ export class AuthService {
     this._currentUser.next(null);
     this.router.navigate(['/login']);
   }
+  updateUserLocal(partialData: Partial<User>) {
+    const current = this.getCurrentUser();
+    if (current) {
+      const updated = { ...current, ...partialData };
+      this.updateLocalStorageUser(updated);
+    }
+  }
+
+  // Helper privado para guardar y notificar
+  private updateLocalStorageUser(user: User) {
+    localStorage.setItem(this.userKey, JSON.stringify(user));
+    this._currentUser.next(user);
+  }
 }
