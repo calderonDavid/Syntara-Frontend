@@ -101,6 +101,9 @@ export class ApiService {
   getDistributorReport(storeName: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/reports/distributor-intelligence`, { storeName });
   }
+  getStoredCompetitors(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/reports/competitors-list`);
+  }
   // BÚSQUEDA MAYORISTA
   searchWholesale(product: string, quantity: number | null, unit: string): Observable<any[]> {
     let params = new HttpParams();

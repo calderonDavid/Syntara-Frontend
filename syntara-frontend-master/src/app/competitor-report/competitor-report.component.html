@@ -6,6 +6,7 @@
     <p>Analiza el precio de un producto específico frente al mercado.</p>
   </div>
 
+  <!-- TARJETA DE BÚSQUEDA SUPERIOR (Blindada) -->
   <div class="config-card">
     <div class="input-wrapper">
       <label for="prodInput">Producto a analizar</label>
@@ -16,16 +17,25 @@
             type="text"
             [(ngModel)]="targetProduct"
             placeholder="Ej: Arroz Diana, Iphone 15..."
-            (keyup.enter)="generateReport()">
+            (keyup.enter)="generatePreview()">
         </div>
 
-        <button (click)="generateReport()" [disabled]="isLoading || !targetProduct" class="generate-btn">
-          <span *ngIf="!isLoading">Analizar Producto</span>
-          <div *ngIf="isLoading" class="spinner-small"></div>
-        </button>
+        <!-- WRAPPER PARA EL TOOLTIP (Solución al hover en disabled) -->
+        <div class="button-wrapper" [class.is-loading]="isLoading">
+
+          <!-- Tooltip fuera del botón, controlado por el wrapper -->
+          <span class="loading-tooltip" *ngIf="isLoading">
+            Espera que termine la búsqueda
+          </span>
+
+          <button class="generate-btn" (click)="generatePreview()" [disabled]="isLoading || !targetProduct">
+            <span *ngIf="!isLoading">Analizar Producto</span>
+            <div *ngIf="isLoading" class="spinner-small"></div>
+          </button>
+        </div>
+
       </div>
       <small class="hint">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         Comparando precios contra tu tienda: <strong>{{ myStoreName }}</strong>
       </small>
     </div>
@@ -35,10 +45,12 @@
     <span>{{ errorMessage }}</span>
   </div>
 
+  <!-- SECCIÓN DE RESULTADOS -->
   <div *ngIf="!isLoading && reportData" class="results-section">
 
     <div class="main-product-card">
 
+      <!-- Info del Producto -->
       <div class="card-content-top">
         <div class="product-info">
           <h3>{{ reportData.productName }}</h3>
@@ -53,26 +65,29 @@
         </div>
       </div>
 
+      <!-- --- GRÁFICO DE PRECIOS --- -->
+      <div class="chart-container">
+        <canvas #priceChart></canvas>
+      </div>
+
+      <!-- BOTÓN DE CONFIGURAR REPORTE -->
       <div class="card-actions">
-        <button class="send-report-btn" (click)="sendReportEmail()">
-          Enviar Reporte a Correo
+        <button class="send-report-btn" (click)="openReportModal()">
+          Configurar Reporte
         </button>
       </div>
 
     </div>
 
+    <!-- GRID DE COMPETENCIA -->
     <div class="competitors-grid">
-      <h4 class="grid-title">Precios en la Competencia ({{ competitors.length }})</h4>
-
       <div class="comp-card" *ngFor="let comp of competitors">
         <div class="comp-header">
           <span class="store-name">{{ comp.store }}</span>
           <span class="date">{{ comp.date | date:'MMM d' }}</span>
         </div>
-
         <div class="comp-body">
           <span class="comp-price">$ {{ comp.price | number:'1.0-0' }}</span>
-
           <ng-container *ngIf="reportData.myPrice">
             <span class="badge cheaper" *ngIf="comp.price < reportData.myPrice">
               ▼ {{ getDifferencePercent(reportData.myPrice, comp.price) | number:'1.0-0' }}%
@@ -85,17 +100,66 @@
             </span>
           </ng-container>
         </div>
-
         <a *ngIf="comp.url" [href]="comp.url" target="_blank" class="view-link">Ver en tienda</a>
       </div>
     </div>
 
   </div>
 
+  <!-- MODAL -->
+  <div *ngIf="showReportModal" class="modal-overlay">
+    <div class="modal-container report-config-modal">
+      <h3>Configuración de Reporte</h3>
+      <p class="modal-desc">Personaliza los parámetros para la exportación del documento.</p>
+      <div class="form-section">
+        <div class="form-group">
+          <label>Seleccionar Empresas (Resultados Actuales):</label>
+          <div class="checklist-grid" *ngIf="availableCompetitors.length > 0">
+            <label *ngFor="let store of availableCompetitors" class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="reportConfig.selectedCompetitors[store]">
+              {{ store | titlecase }}
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Rango de Fechas (Análisis):</label>
+          <div class="date-row">
+            <div class="date-field">
+              <span>Desde:</span>
+              <input type="date" [(ngModel)]="reportConfig.dateStart" [min]="minDate" [max]="maxDate">
+            </div>
+            <div class="date-field">
+              <span>Hasta:</span>
+              <input type="date" [(ngModel)]="reportConfig.dateEnd" [min]="minDate" [max]="maxDate">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Formato de Exportación:</label>
+          <select [(ngModel)]="reportConfig.format" class="form-select">
+            <option value="pdf">PDF (Documento)</option>
+            <option value="xlsx">Excel (.xlsx)</option>
+            <option value="both">Ambos</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Enviar copia a (CC):</label>
+          <input type="email" [(ngModel)]="reportConfig.ccEmail" placeholder="correo@extra.com" class="form-input">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button (click)="closeReportModal()" class="cancel-btn">Cancelar</button>
+        <button (click)="confirmGeneration()" class="confirm-btn">Generar Reporte</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
   <div *ngIf="showToast" class="custom-toast" [ngClass]="toastType" [@toastAnimation]>
     <div class="toast-icon">
       <svg *ngIf="toastType === 'success'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
       <svg *ngIf="toastType === 'error'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+      <svg *ngIf="toastType === 'warning'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
     </div>
     <span class="toast-text">{{ toastMessage }}</span>
   </div>

@@ -6,6 +6,7 @@
     <p>Descubre qué productos están buscando más los usuarios.</p>
   </div>
 
+  <!-- TARJETA DE CONFIGURACIÓN INICIAL -->
   <div class="config-card">
     <div class="info-row">
       <div class="company-badge">
@@ -15,6 +16,7 @@
         </div>
       </div>
 
+      <!-- Botón que genera la vista previa en pantalla -->
       <button (click)="generateReport()" [disabled]="isLoading" class="generate-btn">
         <span *ngIf="!isLoading">Analizar Tendencias</span>
         <div *ngIf="isLoading" class="spinner-small"></div>
@@ -23,10 +25,10 @@
   </div>
 
   <div *ngIf="errorMessage" class="error-banner">
-    <div class="error-icon"></div>
     <span>{{ errorMessage }}</span>
   </div>
 
+  <!-- SECCIÓN DE RESULTADOS (VISTA PREVIA - TARJETAS DE TENDENCIAS) -->
   <div *ngIf="!isLoading && trendsData.length > 0" class="results-section">
 
     <div class="summary-card" *ngIf="summaryText">
@@ -34,6 +36,7 @@
       <p>{{ summaryText }}</p>
     </div>
 
+    <!-- GRID DE TARJETAS (Estilo Preservado) -->
     <div class="trends-grid">
       <div class="trend-card" *ngFor="let item of trendsData">
 
@@ -68,18 +71,96 @@
       </div>
     </div>
 
+    <!-- BOTÓN INFERIOR: CONFIGURAR REPORTE (Abre el Modal) -->
     <div class="actions-footer">
-      <button class="send-report-btn" (click)="sendReportEmail()">
-        Enviar Reporte a Correo
+      <button class="send-report-btn" (click)="openReportModal()">
+        Configurar Reporte de Tendencias
       </button>
     </div>
 
   </div>
 
+  <!-- --- MODAL (POPUP) --- -->
+  <div *ngIf="showReportModal" class="modal-overlay">
+    <div class="modal-container report-config-modal">
+      <h3>Configuración de Tendencias</h3>
+      <p class="modal-desc">Filtra los datos para obtener un análisis preciso de tu inventario.</p>
+
+      <div class="form-section">
+
+        <!-- 1. Checklist Productos (Basado en resultados actuales) -->
+        <div class="form-group">
+          <label>Seleccionar Productos (De los resultados actuales):</label>
+
+          <p *ngIf="availableProducts.length === 0" class="empty-msg">
+            No hay productos en el análisis actual.
+          </p>
+
+          <div class="checklist-grid" *ngIf="availableProducts.length > 0">
+            <label *ngFor="let prod of availableProducts" class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="reportConfig.selectedProducts[prod]">
+              {{ prod | titlecase }}
+            </label>
+          </div>
+        </div>
+
+        <!-- 2. Rango de Fechas -->
+        <div class="form-group">
+          <label>Rango de Fechas (Búsquedas):</label>
+          <div class="date-row">
+            <div class="date-field">
+              <span>Desde:</span>
+              <!-- BLINDAJE -->
+              <input type="date"
+                     [(ngModel)]="reportConfig.dateStart"
+                     [min]="minDate"
+                     [max]="maxDate">
+            </div>
+            <div class="date-field">
+              <span>Hasta:</span>
+              <!-- BLINDAJE -->
+              <input type="date"
+                     [(ngModel)]="reportConfig.dateEnd"
+                     [min]="minDate"
+                     [max]="maxDate">
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Formato -->
+        <div class="form-group">
+          <label>Formato de Exportación:</label>
+          <select [(ngModel)]="reportConfig.format" class="form-select">
+            <option value="xlsx">Excel (.xlsx)</option>
+            <option value="pdf">PDF</option>
+            <option value="both">Ambos</option>
+          </select>
+        </div>
+
+        <!-- 4. CC Email -->
+        <div class="form-group">
+          <label>Enviar copia a (CC):</label>
+          <input type="email" [(ngModel)]="reportConfig.ccEmail" placeholder="correo@extra.com" class="form-input">
+        </div>
+
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="closeReportModal()" class="cancel-btn">Cancelar</button>
+        <button (click)="confirmGeneration()" class="confirm-btn">Generar Reporte</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
   <div *ngIf="showToast" class="custom-toast" [ngClass]="toastType" [@toastAnimation]>
     <div class="toast-icon">
+      <!-- Icono Success -->
       <svg *ngIf="toastType === 'success'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      <!-- Icono Error -->
       <svg *ngIf="toastType === 'error'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+      <!-- Icono Warning -->
+      <svg *ngIf="toastType === 'warning'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
     </div>
     <span class="toast-text">{{ toastMessage }}</span>
   </div>
