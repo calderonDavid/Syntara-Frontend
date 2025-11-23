@@ -1,120 +1,261 @@
 .cart-container {
-  max-width: 1000px;
-  margin: 100px auto;
-  padding: 20px;
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px 100px;
   font-family: 'Poppins', sans-serif;
 
   h2 {
     color: #004b3a;
     text-align: center;
     margin-bottom: 30px;
+    font-family: 'Cabin', sans-serif;
+
+    span {
+      font-weight: 400;
+      font-size: 0.8em;
+      color: #666;
+    }
   }
 }
 
+/* Layout: Lista y Resumen */
 .cart-content {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 350px; /* Resumen fijo a la derecha en PC */
   gap: 30px;
+  align-items: start;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr; /* En celular, resumen baja automáticamente */
   }
 }
 
+/* Tarjeta de Item */
 .cart-item {
-  background: rgba(255, 255, 255, 0.9);
+  background: white;
+  border-radius: 20px;
   padding: 20px;
-  border-radius: 15px;
   margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid #f0f0f0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 
-  .item-details {
-    h3 { margin: 0 0 5px; font-size: 18px; color: #333; }
-    .store { margin: 0; color: #666; font-size: 14px; }
-    .link { font-size: 12px; color: #54a78b; text-decoration: none; }
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
   }
 
-  .item-price {
-    text-align: right;
-    margin-right: 15px;
-    .price { font-weight: bold; color: #004b3a; font-size: 18px; margin: 0; }
+  .store-tag {
+    display: inline-block;
+    background: #eaf7f3;
+    color: #54a78b;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
   }
 
-  .delete-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    transition: transform 0.2s;
-    &:hover { transform: scale(1.2); }
+  h3 { margin: 0 0 5px 0; font-size: 18px; color: #333; }
+
+  .item-meta {
+    font-size: 14px; color: #666;
+    display: flex; gap: 15px;
+
+    .link { color: #54a78b; text-decoration: none; }
   }
 }
 
+.item-pricing {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  @media (max-width: 600px) {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .total-item-price {
+    font-size: 20px; font-weight: 700; color: #004b3a;
+  }
+  small { color: #999; font-size: 12px; }
+
+  .delete-btn {
+    background: #fff5f5; color: #d32f2f; border: none;
+    padding: 8px; border-radius: 50%; cursor: pointer;
+    margin-top: 8px; font-size: 16px; transition: transform 0.2s;
+
+    &:hover { transform: scale(1.1); background: #ffe0e0; }
+  }
+}
+
+/* Resumen Total */
 .cart-summary {
   background: white;
-  padding: 25px;
-  border-radius: 20px;
-  height: fit-content;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+  border-radius: 25px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  position: sticky; /* Se queda fijo al hacer scroll */
+  top: 20px;
 
-  h3 { margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+  h3 { margin-top: 0; color: #004b3a; font-size: 22px; }
 
   .summary-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
+    display: flex; justify-content: space-between; margin-bottom: 15px; color: #555;
     font-size: 16px;
 
     &.total {
-      font-weight: bold;
-      font-size: 20px;
-      color: #004b3a;
-      margin-top: 20px;
-      border-top: 1px solid #eee;
-      padding-top: 10px;
+      font-weight: 700; font-size: 20px; color: #333; margin-top: 20px;
+      .final-price { color: #004b3a; font-size: 24px; }
     }
   }
 
-  .checkout-btn, .clear-btn {
-    width: 100%;
-    padding: 12px;
-    border-radius: 50px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 10px;
-  }
+  .summary-divider { height: 1px; background: #eee; margin: 15px 0; }
 
   .checkout-btn {
-    background-color: #54a78b;
-    color: white;
-    &:hover { background-color: #4a9479; }
+    width: 100%; background: #54a78b; color: white; border: none;
+    padding: 15px; border-radius: 50px; font-size: 18px; font-weight: 600;
+    cursor: pointer; margin-top: 20px; transition: background 0.3s;
+    &:hover { background: #4a9479; }
   }
 
   .clear-btn {
-    background-color: transparent;
-    color: #D32F2F;
-    border: 1px solid #D32F2F;
-    &:hover { background-color: #ffebee; }
+    width: 100%; background: none; border: none; color: #d32f2f;
+    margin-top: 10px; cursor: pointer; text-decoration: underline;
   }
 }
+// ... (mantén tus estilos de .cart-container, .cart-content, .cart-item, etc. arriba)
 
-.empty-cart {
+// --- ESTILOS DEL CARRITO VACÍO (Basado en Home No-Results) ---
+.empty-cart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 50px;
-  background: rgba(255,255,255,0.8);
-  border-radius: 20px;
 
-  .back-btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: #54a78b;
+  // Mismo fondo y sombras que en Home
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 40px;
+  padding: 50px;
+  margin: 30px auto;
+  max-width: 700px;
+  width: 90%;
+
+  box-shadow: 0 15px 35px rgba(0, 75, 58, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  animation: slideUp 0.5s ease-out; // Asegúrate de tener el keyframe slideUp o defínelo abajo
+
+  .icon-wrapper {
+    background-color: #eaf7f3;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+
+    .empty-cart-icon {
+      width: 50px;
+      height: 50px;
+      color: #54a78b; // Verde corporativo
+      animation: pulse 2s infinite ease-in-out;
+    }
+  }
+
+  h3 {
+    font-family: 'Rubik', sans-serif;
+    font-size: 28px;
+    color: #042940;
+    margin: 0 0 15px 0;
+  }
+
+  p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 25px;
+    line-height: 1.5;
+
+    strong {
+      color: #004b3a;
+      font-weight: 600;
+    }
+  }
+
+  // Sección de sugerencias idéntica al Home
+  .suggestions {
+    background-color: #f8f9fa;
+    padding: 20px 30px;
+    border-radius: 20px;
+    text-align: left;
+    width: 100%;
+    max-width: 450px;
+    margin-bottom: 30px; // Espacio extra para el botón
+
+    span {
+      display: block;
+      font-weight: 600;
+      color: #54a78b;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+
+      li {
+        color: #666;
+        margin-bottom: 8px;
+        font-size: 15px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  // Botón "Ir a Buscar" (Estilo similar a tus botones principales)
+  .start-shopping-btn {
+    background-color: #54a78b;
     color: white;
     text-decoration: none;
-    border-radius: 20px;
+    padding: 14px 35px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(84, 167, 139, 0.3);
+    display: inline-block;
+
+    &:hover {
+      background-color: #4a9479;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(84, 167, 139, 0.4);
+    }
   }
 }
+
+// Animaciones necesarias (si no están definidas globalmente)
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

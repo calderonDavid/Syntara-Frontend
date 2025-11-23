@@ -314,51 +314,73 @@
     }
   }
 }
-.add-cart-btn {
-  background-color: #54a78b; // Verde corporativo
-  color: white;
+// En src/app/home/home.component.scss
+
+// Asegúrate de que la celda tenga alineación centrada
+.results-table tbody td.action-cell {
+  text-align: center;
+  vertical-align: middle;
+  padding: 10px; // Ajuste de padding para que no se vea apretado
+}
+
+// --- NUEVO ESTILO DEL BOTÓN ---
+.cart-action-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   border: none;
-  border-radius: 25px; // Bordes redondeados suaves
-  padding: 8px 16px;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
+
+  // Gradiente sutil basado en tu verde corporativo
+  background: linear-gradient(135deg, #54a78b, #428a70);
+  color: white;
+
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(84, 167, 139, 0.25); // Sombra verde suave
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); // Efecto rebote suave
+  box-shadow: 0 4px 12px rgba(84, 167, 139, 0.4); // Sombra verde difuminada
 
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke: white;
+    transition: transform 0.3s ease;
+  }
+
+  .plus-sign {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    opacity: 0; // Oculto por defecto, aparece al hover
+    transform: translateY(5px);
+    transition: all 0.3s ease;
+  }
+
+  // Estados Hover y Active
   &:hover {
-    background-color: #4a9479; // Verde un poco más oscuro al hover
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(84, 167, 139, 0.35);
-  }
+    background: #004b3a; // Verde oscuro (Syntara Títulos) al pasar el mouse
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 75, 58, 0.3);
 
-  &:active {
-    transform: translateY(0);
-  }
+    svg {
+      transform: translateX(-2px); // Mueve un poco el carrito a la izquierda
+    }
 
-  // Estado deshabilitado visualmente (opcional, si quieres que se vea gris cuando no hay sesión)
-  &.disabled {
-    background-color: #a0aec0;
-    box-shadow: none;
-    cursor: not-allowed;
-
-    &:hover {
-      background-color: #a0aec0;
-      transform: none;
+    .plus-sign {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 
-  .cart-icon {
-    width: 18px;
-    height: 18px;
+  &:active {
+    transform: translateY(0) scale(0.95);
+    box-shadow: 0 2px 5px rgba(0, 75, 58, 0.3);
   }
 }
-
 // --- TOOLTIP PERSONALIZADO ---
 .tooltip-wrapper {
   position: relative;
@@ -613,5 +635,41 @@
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+// ... tus estilos existentes ...
+
+// --- ESTILOS DE LA NOTIFICACIÓN (TOAST) ---
+.custom-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: 50px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  min-width: 300px;
+  justify-content: center;
+
+  &.success {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid #54a78b;
+    color: #004b3a;
+    .toast-icon svg { stroke: #54a78b; }
+  }
+
+  &.error {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid #e74c3c;
+    color: #c0392b;
+    .toast-icon svg { stroke: #e74c3c; }
   }
 }

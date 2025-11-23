@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router'; // <--- Importamos Router
+import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { SearchResult } from '../search.service';
 import { ApiService } from '../api.service';
@@ -15,148 +15,159 @@ import { TypewriterDirective } from '../typewriter.directive';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   animations: [
+    // Animación de la lista de resultados
     trigger('listAnimation', [
-      transition('* => *', [ // Cada vez que cambie la lista
+      transition('* => *', [
         query(':enter', [
           style({ opacity: 0, transform: 'translateY(30px)' }),
-          stagger(100, [ // Retraso de 100ms entre cada elemento
+          stagger(100, [
             animate('500ms cubic-bezier(0.35, 0, 0.25, 1)',
               style({ opacity: 1, transform: 'translateY(0)' }))
           ])
         ], { optional: true })
+      ])
+    ]),
+    // NUEVA ANIMACIÓN PARA LA NOTIFICACIÓN FLOTANTE (TOAST)
+    trigger('toastAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translate(-50%, 20px)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'translate(-50%, 0)' }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ opacity: 0, transform: 'translate(-50%, 20px)' }))
       ])
     ])
   ]
 })
 export class HomeComponent implements OnInit {
 
-  // Variables del formulario
   searchQuery: string = '';
   quantity: number | null = 1;
-  measure: string = ''; // -> se mapea a 'unit'
-
-  // Variables de estado y resultados
+  measure: string = '';
   lastSearchQuery: string = '';
   lastSearchQuantity: number = 1;
   lastSearchMeasure: string = '';
   hasSearched: boolean = false;
   isLoading: boolean = false;
   results: (SearchResult & { measureLabel: string })[] = [];
-
-  // Variables de error
   productError: string | null = null;
   measureError: string | null = null;
-  generalError: string | null = null; // Para errores de API
+  generalError: string | null = null;
   greetingName: string = '';
-
-  // Variable para el texto del título animado
   resultsTitleText: string = '';
 
-  // Inyectar Servicios y Router
+  // VARIABLES PARA LA NOTIFICACIÓN (TOAST)
+  showToast: boolean = false;
+  toastMessage: string = '';
+  toastType: 'success' | 'error' = 'success';
+
   constructor(
     private authService: AuthService,
     private apiService: ApiService,
-    private router: Router // <--- Inyectamos el Router aquí
-  ) {
-  }
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
-      if (user && user.name) {
-        this.greetingName = `${user.name}`;
-      } else {
-        this.greetingName = '';
-      }
+      this.greetingName = (user && user.name) ? `${user.name}` : '';
     });
   }
 
   onSearch() {
-    // Limpiar todos los errores al iniciar
     this.productError = null;
     this.measureError = null;
     this.generalError = null;
     this.results = [];
 
-    // Validaciones
-    if (!this.searchQuery.trim()) {
-      this.productError = 'Escribe un producto.';
-    }
-    if (!this.measure || this.measure === '') {
-      this.measureError = 'Selecciona una unidad.';
-    }
-    if (this.productError || this.measureError) {
-      return;
-    }
+    if (!this.searchQuery.trim()) { this.productError = 'Escribe un producto.'; }
+    if (!this.measure) { this.measureError = 'Selecciona una unidad.'; }
+    if (this.productError || this.measureError) return;
 
     this.isLoading = true;
     this.hasSearched = true;
     this.lastSearchQuery = this.searchQuery;
     this.lastSearchQuantity = this.quantity || 1;
     this.lastSearchMeasure = this.measure;
-
-    // Texto que se escribirá automáticamente
     this.resultsTitleText = `Resultados para: ${this.lastSearchQuery} (${this.lastSearchQuantity} ${this.lastSearchMeasure})`;
 
-    this.apiService.searchProducts(
-      this.lastSearchQuery,
-      this.lastSearchQuantity,
-      this.lastSearchMeasure
-    ).subscribe({
-      next: (response: any) => {
+    this.apiService.searchProducts(this.lastSearchQuery, this.lastSearchQuantity, this.lastSearchMeasure)
+      .subscribe({
+        next: (response: any) => {
+          const payload = response.data || response;
+          const resultsArray = payload.results || [];
+          const shortMeasure = this.getMeasureAbbreviation(this.lastSearchMeasure);
+          this.results = resultsArray.map((result: any) => ({ ...result, measureLabel: shortMeasure }));
+          this.results.sort((a: any, b: any) => a.price - b.price);
+          this.searchQuery = '';
+          this.quantity = 1;
+          this.measure = '';
+          this.isLoading = false;
+        },
+        error: (err: any) => {
+          console.error('Error en búsqueda:', err);
+          this.generalError = 'Error al conectar con el backend.';
+          this.isLoading = false;
+        }
+      });
+  }
 
-        const payload = response.data || response;
-        const resultsArray = payload.results || [];
-        const shortMeasure = this.getMeasureAbbreviation(this.lastSearchMeasure);
-        this.results = resultsArray.map((result: any) => ({
-          ...result,
-          measureLabel: shortMeasure
-        }));
-        // Ordenamos por precio
-        this.results.sort((a, b) => a.price - b.price);
-        // Limpiamos solo los campos principales del formulario
-        this.searchQuery = '';
-        this.quantity = 1;
-        this.measure = '';
-        this.isLoading = false;
+  addToCart(item: any) {
+    if (!this.authService.isLoggedIn()) {
+      this.showNotification('Inicia sesión para agregar productos', 'error');
+      setTimeout(() => this.router.navigate(['/login']), 1500);
+      return;
+    }
+
+    // 1. Convertimos y validamos
+    const cleanPrice = Number(item.price);
+    const cleanQuantity = Number(this.lastSearchQuantity);
+
+    if (isNaN(cleanPrice) || cleanPrice <= 0) {
+      this.showNotification('Error: El producto tiene un precio inválido.', 'error');
+      return;
+    }
+
+    // 2. Construir payload EXACTO que llega bien al backend
+    const cartItemPayload = {
+      id: item._id ?? item.id ?? null,   // 👈 garantizamos el id
+      product: item.product ?? "",       // 👈 nunca undefined
+      price: cleanPrice,
+      store: item.store ?? "",
+      url: item.url ?? null,
+      quantity: cleanQuantity > 0 ? cleanQuantity : 1,
+      unit: this.lastSearchMeasure || 'unidad'
+    };
+
+    console.log("🚀 Enviando payload limpio:", cartItemPayload);
+
+    // 3. Enviar al backend con JSON correcto
+    this.apiService.addToCart(cartItemPayload).subscribe({
+      next: (res) => {
+        this.showNotification(`¡${item.product} agregado al carrito!`, 'success');
       },
-      error: (err: any) => {
-        console.error('Error en la búsqueda:', err);
-        this.generalError = 'Error al conectar con el backend. (¿Interceptor y token OK?)';
-        this.isLoading = false;
+      error: (err) => {
+        console.error("❌ Error del servidor:", err);
+        let msg = 'No se pudo agregar el producto.';
+        if (err.status === 400) msg = 'Error de validación: Revisa los datos del producto.';
+        if (err.status === 401) msg = 'Sesión expirada.';
+        this.showNotification(msg, 'error');
       }
     });
   }
 
-  // --- NUEVA FUNCIÓN PARA EL CARRITO ---
-  addToCart(item: any) {
-    // 1. Verificar si el usuario está logueado
-    if (!this.authService.isLoggedIn()) {
-      alert('Debes iniciar sesión para usar el carrito.');
-      this.router.navigate(['/login']);
-      return;
-    }
 
-    // 2. Preparar objeto para el backend
-    // Usamos la cantidad y unidad que el usuario buscó originalmente
-    const cartItem = {
-      product: item.product,
-      price: item.price,
-      store: item.store,
-      url: item.url,
-      quantity: this.lastSearchQuantity || 1,
-      unit: this.lastSearchMeasure || 'unidad'
-    };
 
-    // 3. Llamar al servicio
-    this.apiService.addToCart(cartItem).subscribe({
-      next: () => {
-        alert(`¡${item.product} agregado al carrito!`);
-      },
-      error: (err: any) => {
-        console.error('Error al agregar al carrito:', err);
-        alert('Ocurrió un error al intentar agregar el producto.');
-      }
-    });
+
+  // --- FUNCIÓN PARA MOSTRAR EL TOAST (NOTIFICACIÓN) ---
+  private showNotification(message: string, type: 'success' | 'error') {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+
+    // Ocultar automáticamente después de 3 segundos
+    setTimeout(() => {
+      this.showToast = false;
+    }, 3000);
   }
 
   private getMeasureAbbreviation(fullMeasure: string): string {
