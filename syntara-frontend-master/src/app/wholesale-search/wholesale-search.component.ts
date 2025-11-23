@@ -40,19 +40,31 @@ export class WholesaleSearchComponent {
   // Variables de error para los tooltips
   productError: string | null = null;
   measureError: string | null = null;
+  quantityError: string | null = null;
 
   constructor(private apiService: ApiService) {}
+
+  preventInvalidCharacters(event: KeyboardEvent): void {
+    // Bloqueamos el signo menos (-), mas (+), y la 'e' (exponente)
+    if (['-', '+', 'e', 'E'].includes(event.key)) {
+      event.preventDefault();
+    }
+  }
 
   onSearch() {
     // 1. Resetear errores
     this.productError = null;
     this.measureError = null;
+    this.quantityError = null;
     this.generalError = null;
     this.results = [];
 
-    // 2. Validaciones visuales (Igual al Home)
+
     if (!this.searchQuery.trim()) {
       this.productError = 'Escribe un producto.';
+    }
+    if (!this.quantity || this.quantity <= 0) {
+      this.quantityError = 'Mínimo 1.';
     }
     if (!this.measure) {
       this.measureError = 'Selecciona unidad.';

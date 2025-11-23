@@ -801,5 +801,74 @@
     }
   }
 }
+.spinner {
+  margin: 0 auto 20px; // Centrado y separado del texto
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3); // Borde suave transparente
+  border-top: 5px solid #ffffff; // Borde superior blanco brillante
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+/* Estilos para el estado de carga del botón */
+.search-button {
+  position: relative; /* Necesario para posicionar el tooltip */
+
+  &:disabled {
+    background-color: #b0bec5 !important; /* Gris claro */
+    cursor: not-allowed;
+    transform: none !important; /* Quita el efecto de movimiento */
+    box-shadow: none;
+
+    /* Si hay una imagen (logo), la ponemos en escala de grises y un poco transparente */
+    .search-button-icon {
+      filter: grayscale(100%) opacity(0.7);
+    }
+  }
+
+  /* El Tooltip (Mensaje flotante) */
+  .loading-tooltip {
+    position: absolute;
+    bottom: 120%; /* Aparece encima del botón */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none; /* Para que no interfiera con el click */
+    z-index: 10;
+
+    /* Triangulito decorativo */
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+  }
+
+  /* Mostrar tooltip SOLO si el botón está deshabilitado (loading) y pasamos el mouse */
+  &:disabled:hover .loading-tooltip {
+    opacity: 1;
+    visibility: visible;
+    bottom: 130%; /* Pequeña animación hacia arriba */
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }

@@ -59,6 +59,7 @@ export class HomeComponent implements OnInit {
   productError: string | null = null;
   measureError: string | null = null;
   generalError: string | null = null;
+  quantityError: string | null = null;
   greetingName: string = '';
   resultsTitleText: string = '';
   showGuestBlockModal: boolean = false; // Modal "Regístrate"
@@ -101,14 +102,22 @@ export class HomeComponent implements OnInit {
       });
     }
   }
+  preventInvalidCharacters(event: KeyboardEvent): void {
+    // Bloqueamos el signo menos (-), mas (+), y la 'e' (exponente)
+    if (['-', '+', 'e', 'E'].includes(event.key)) {
+      event.preventDefault();
+    }
+  }
 
   onSearch() {
     this.productError = null;
     this.measureError = null;
     this.generalError = null;
+    this.quantityError = null;
     this.results = [];
 
     if (!this.searchQuery.trim()) { this.productError = 'Escribe un producto.'; }
+    if (!this.quantity || this.quantity <= 0) { this.quantityError = 'Mínimo 1.'; }
     if (!this.measure) { this.measureError = 'Selecciona una unidad.'; }
     if (this.productError || this.measureError) return;
 

@@ -11,7 +11,6 @@
       <label for="prodInput">Producto a analizar</label>
       <div class="search-row">
         <div class="input-icon-wrap">
-          <span class="icon">🔍</span>
           <input
             id="prodInput"
             type="text"
@@ -33,7 +32,6 @@
   </div>
 
   <div *ngIf="errorMessage" class="error-banner">
-    <div class="error-icon">⚠️</div>
     <span>{{ errorMessage }}</span>
   </div>
 
@@ -57,7 +55,7 @@
 
       <div class="card-actions">
         <button class="send-report-btn" (click)="sendReportEmail()">
-          Enviar Reporte a Correo ✉️
+          Enviar Reporte a Correo
         </button>
       </div>
 

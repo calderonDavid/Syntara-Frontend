@@ -46,6 +46,7 @@
       </h2>
 
       <div *ngIf="isLoading" class="loading-indicator">
+        <div class="spinner"></div>
         <p>Buscando los mejores precios...</p>
       </div>
 
@@ -135,13 +136,17 @@
         </div>
       </div>
       <div class="search-input-wrapper quantity-input">
-        <input
-          type="number"
-          placeholder="Cant."
-          class="search-input hide-spin-buttons"
-          min="1" max="9999"
-          [(ngModel)]="quantity"
-          (keyup.enter)="onSearch()">
+        <input type="number"
+               placeholder="Cant."
+               class="search-input hide-spin-buttons"
+               min="1"
+               [(ngModel)]="quantity"
+               (keydown)="preventInvalidCharacters($event)"
+               (keyup.enter)="onSearch()">
+
+        <div class="search-error-tooltip" *ngIf="quantityError">
+          {{ quantityError }}
+        </div>
       </div>
       <div class="search-input-wrapper measure-select">
         <select class="search-input" [(ngModel)]="measure">
@@ -180,7 +185,9 @@
           {{ measureError }}
         </div>
       </div>
-      <button class="search-button" (click)="onSearch()">
+      <button class="search-button" (click)="onSearch()" [disabled]="isLoading">
+        <span class="loading-tooltip" *ngIf="isLoading">Espera que termine la búsqueda</span>
+
         <span *ngIf="!hasSearched">Buscar</span>
         <img *ngIf="hasSearched" src="assets/images/logopequ.png" alt="Buscar" class="search-button-icon">
       </button>

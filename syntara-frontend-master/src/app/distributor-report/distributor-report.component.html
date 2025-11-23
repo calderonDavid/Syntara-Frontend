@@ -9,7 +9,6 @@
   <div class="config-card">
     <div class="info-row">
       <div class="company-badge">
-        <span class="icon">🏢</span>
         <div class="text-info">
           <span class="label">Analizando demanda para:</span>
           <h3>{{ targetStore }}</h3>
@@ -24,14 +23,14 @@
   </div>
 
   <div *ngIf="errorMessage" class="error-banner">
-    <div class="error-icon">📉</div>
+    <div class="error-icon"></div>
     <span>{{ errorMessage }}</span>
   </div>
 
   <div *ngIf="!isLoading && trendsData.length > 0" class="results-section">
 
     <div class="summary-card" *ngIf="summaryText">
-      <h4>📊 Resumen de Datos</h4>
+      <h4>Resumen de Datos</h4>
       <p>{{ summaryText }}</p>
     </div>
 
@@ -39,7 +38,7 @@
       <div class="trend-card" *ngFor="let item of trendsData">
 
         <div class="trend-header">
-          <div class="rank-badge">#{{ item.demandScore }} Búsquedas</div>
+          <div class="rank-badge">{{ item.demandScore }} Búsquedas</div>
           <h3>{{ item.product | titlecase }}</h3>
           <span class="demand-tag" [ngClass]="getDemandClass(item.demandScore)">
             Demanda {{ getDemandLevel(item.demandScore) }}
@@ -71,7 +70,7 @@
 
     <div class="actions-footer">
       <button class="send-report-btn" (click)="sendReportEmail()">
-        Enviar Reporte a Correo ✉️
+        Enviar Reporte a Correo
       </button>
     </div>
 

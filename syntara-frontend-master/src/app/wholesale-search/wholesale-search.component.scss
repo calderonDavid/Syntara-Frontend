@@ -1,42 +1,37 @@
-/* Heredar estilos base */
+/* src/app/wholesale-search/wholesale-search.component.scss */
+
 :host { display: block; width: 100%; }
 
 .main-content {
   display: flex; flex-direction: column; align-items: center;
-  padding: 80px 20px; min-height: 80vh; transition: all 0.5s ease;
+  padding: 80px 20px 140px; /* Espacio para el buscador flotante */
+  min-height: 80vh;
   font-family: 'Poppins', sans-serif;
 
-  &.active-view { justify-content: flex-start; padding-top: 20px; }
+  &.active-view { justify-content: flex-start; padding-top: 40px; }
 }
 
+/* --- ESTILOS DE LA BARRA DE BÚSQUEDA (Estándar Syntara) --- */
 .intro-section {
   text-align: center; animation: fadeIn 0.5s;
-
   .header-badge {
     display: inline-block; background: #e3f2fd; color: #1565c0;
     padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
     text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px;
   }
-
-  .search-prompt {
-    font-family: 'Rubik', sans-serif; color: #004b3a; font-size: 42px; margin: 0 0 15px;
-  }
-
+  .search-prompt { font-family: 'Rubik', sans-serif; color: #004b3a; font-size: 42px; margin: 0 0 15px; }
   .subtitle { color: #555; font-size: 18px; max-width: 600px; margin: 0 auto 50px; }
 }
 
-/* BARRA DE BÚSQUEDA */
 .search-section {
   display: flex; align-items: center; gap: 15px;
   width: 100%; max-width: 1000px; transition: all 0.6s;
-  position: relative;
-  z-index: 100;
+  position: relative; z-index: 100; margin: 0 auto;
 
   &.search-active {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
     background: #fff; padding: 15px; border-radius: 80px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2); width: 95%; max-width: 1000px;
-
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25); width: 95%; max-width: 1000px;
     .search-input-wrapper { background: #f0f2f5; height: 60px; }
     .search-button { height: 60px; width: 60px; padding: 0; display: flex; justify-content: center; align-items: center; }
   }
@@ -45,63 +40,132 @@
 .search-input-wrapper {
   display: flex; align-items: center; background: #e2e4e8;
   border-radius: 60px; padding: 0 25px; height: 70px; flex-grow: 1;
-  position: relative; /* Necesario para posicionar el tooltip */
-  transition: all 0.3s ease;
-
-  &:focus-within {
-    background: #fff;
-    box-shadow: 0 0 0 2px #54a78b inset;
-  }
-
+  position: relative; transition: all 0.3s ease;
+  &:focus-within { background: #fff; box-shadow: 0 0 0 2px #54a78b inset; }
   input, select {
     width: 100%; border: none; background: transparent;
     font-family: 'Poppins', sans-serif; font-size: 18px; outline: none; color: #333;
   }
+}
 
-  select {
-    cursor: pointer;
-    option { color: #333; padding: 5px; }
-    optgroup { color: #004b3a; font-weight: 700; }
+/* --- TABLA DE RESULTADOS (ESTILO SYNTARA UNIFICADO) --- */
+.results-section {
+  width: 100%; max-width: 1100px; margin-top: 20px; animation: slideUp 0.5s;
+}
+
+.results-title {
+  text-align: center; font-family: 'Rubik', sans-serif;
+  color: #004b3a; font-size: 32px; margin-bottom: 30px;
+}
+
+/* Contenedor de Tabla: Igual a Home/History */
+.results-table-container {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  margin-bottom: 40px;
+}
+
+.results-table {
+  table-layout: fixed;
+
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 150px;     /* Ajusta según necesites */
+    min-width: 150px; /* evita que se haga más pequeña */
+    text-align: center;
+  }
+
+  border-collapse: collapse;
+  font-family: 'Poppins', sans-serif;
+
+  /* Encabezados Grises */
+  thead {
+    background-color: #e0e0e0;
+    th {
+      padding: 20px;
+      text-align: center;
+      font-weight: 700;
+      color: #444;
+      text-transform: uppercase;
+      font-size: 16px;
+    }
+  }
+
+  /* Cuerpo */
+  tbody {
+    tr {
+      border-bottom: 1px solid #eee;
+      transition: background-color 0.2s;
+      &:hover { background-color: #f3f4f6; }
+      &:last-child { border-bottom: none; }
+    }
+
+    td {
+      padding: 20px;
+      font-size: 18px;
+      color: #333;
+      vertical-align: middle;
+    }
+  }
+
+  /* Estilos específicos de columnas */
+  .store-name {
+    font-weight: 700;
+    color: #004b3a; /* Verde Corporativo */
+    text-transform: capitalize;
+  }
+
+  .product-name {
+    font-weight: 500;
+  }
+
+  .price-col {
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  .action-link {
+    background-color: #e0f2f1;
+    color: #00695c;
+    padding: 6px 20px;
+    border-radius: 16px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: background 0.2s;
+
+    &:hover {
+      background-color: #b2dfdb;
+      color: #004b3a;
+    }
+  }
+
+  .offer-badge {
+    background-color: #ffebee;
+    color: #c62828;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-weight: 700;
+    vertical-align: middle;
   }
 }
 
-/* ESTILOS DE LA ALERTA DE ERROR (TOOLTIP ROJO) */
+/* --- ESTILOS DE ERROR Y LOADING --- */
 .search-error-tooltip {
-  position: absolute;
-  top: 85px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ff4d4d;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 15px;
-  font-size: 13px;
-  font-weight: 600;
-  box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
-  white-space: nowrap;
-  animation: shake 0.4s ease-in-out;
-  z-index: 200;
-  pointer-events: none;
-
+  position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
+  background-color: #ff4d4d; color: white; padding: 10px 15px;
+  border-radius: 15px; font-size: 13px; font-weight: 600;
+  box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3); white-space: nowrap;
   &::after {
-    content: '';
-    position: absolute;
-    top: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 0 6px 6px 6px;
-    border-style: solid;
-    border-color: transparent transparent #ff4d4d transparent;
+    content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    border-width: 0 6px 6px 6px; border-style: solid; border-color: transparent transparent #ff4d4d transparent;
   }
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(-50%); }
-  20%, 60% { transform: translateX(calc(-50% - 5px)); }
-  40%, 80% { transform: translateX(calc(-50% + 5px)); }
-}
-
-/* Resto de inputs */
 .product-input { flex-grow: 4; }
 .quantity-input { flex-grow: 1; max-width: 120px; input { text-align: center; } }
 .measure-select { flex-grow: 2; max-width: 250px; }
@@ -112,40 +176,62 @@
   height: 70px; transition: all 0.3s;
   &:hover { background: #00695c; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 }
-
 .search-button-icon { height: 30px; width: auto; }
 .hide-spin-buttons::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+/* ESTILOS DE BLOQUEO (Carga) */
+.search-button {
+  position: relative;
 
-/* TABLA DE RESULTADOS */
-.results-section { width: 100%; max-width: 1200px; margin-top: 20px; animation: slideUp 0.5s; }
-.results-title { text-align: center; font-family: 'Rubik', sans-serif; color: #004b3a; font-size: 32px; margin-bottom: 30px; }
+  &:disabled {
+    background-color: #94a3b8 !important; /* Un gris azulado (Slate 400) para Enterprise */
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
 
-.results-table-container {
-  background: rgba(255,255,255,0.95); border-radius: 25px; overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-}
+    .search-button-icon {
+      filter: grayscale(100%) opacity(0.6);
+    }
+  }
 
-.results-table {
-  width: 100%; border-collapse: collapse;
-  th { background: #e0e0e0; padding: 20px; text-align: left; font-weight: 700; color: #444; text-transform: uppercase; font-size: 14px; }
-  td { padding: 20px; border-bottom: 1px solid #eee; font-size: 16px; color: #333; }
+  .loading-tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1e293b; /* Fondo oscuro Enterprise */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 10;
 
-  .store-name { font-weight: 700; color: #004b3a; text-transform: capitalize; }
-  .price-col { font-weight: 700; font-size: 18px; }
-  .offer-price { color: #d32f2f; }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1e293b transparent transparent transparent;
+    }
+  }
 
-  .store-link {
-    background: #e0f2f1; color: #00695c; padding: 8px 15px; border-radius: 20px;
-    text-decoration: none; font-weight: 600; font-size: 13px;
-    &:hover { background: #b2dfdb; }
+  &:disabled:hover .loading-tooltip {
+    opacity: 1;
+    visibility: visible;
+    bottom: 135%;
   }
 }
-
 .loading-indicator, .error-message, .no-results-container {
   text-align: center; padding: 40px; font-size: 18px;
 }
 .spinner { margin: 0 auto 20px; width: 40px; height: 40px; border: 4px solid #eee; border-top: 4px solid #004b3a; border-radius: 50%; animation: spin 1s infinite; }
-
 
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

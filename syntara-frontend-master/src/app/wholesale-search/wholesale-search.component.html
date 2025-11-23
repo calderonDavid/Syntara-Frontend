@@ -7,6 +7,7 @@
   </div>
 
   <div class="results-section" *ngIf="hasSearched">
+
     <h2 class="results-title">
       <span [appTypewriter]="resultsTitleText" [typingSpeed]="40"></span>
     </h2>
@@ -27,21 +28,31 @@
           <th>PROVEEDOR</th>
           <th>PRODUCTO</th>
           <th>PRECIO TOTAL</th>
-          <th>ACCIÓN</th>
+          <th style="text-align: center;">ACCIÓN</th>
           <th>FECHA</th>
         </tr>
         </thead>
         <tbody [@listAnimation]="results.length">
         <tr *ngFor="let item of results">
+
           <td class="store-name">{{ item.store }}</td>
-          <td class="product-name">{{ item.product }}</td>
-          <td class="price-col" [class.offer-price]="item.isOffer">
+
+          <td class="product-name">
+            {{ item.product | titlecase }}
+            <span *ngIf="item.isOffer" class="offer-badge">OFERTA</span>
+          </td>
+
+          <td class="price-col">
             $ {{ item.price | number:'1.0-0' }}
           </td>
-          <td>
-            <a [href]="item.url" target="_blank" class="store-link">Ver Oferta</a>
+
+          <td style="text-align: center;">
+            <a [href]="item.url" target="_blank" class="action-link">
+              Ver Oferta
+            </a>
           </td>
-          <td>{{ item.date | date:'shortDate' }}</td>
+
+          <td>{{ item.date | date:'mediumDate' }}</td>
         </tr>
         </tbody>
       </table>
@@ -49,24 +60,29 @@
 
     <div class="no-results-container" *ngIf="!isLoading && results.length === 0 && !generalError">
       <h3>No encontramos ofertas mayoristas</h3>
-      <p>Intenta buscar "Arroz" en vez de una referencia muy específica.</p>
+      <p>Intenta buscar términos más generales.</p>
     </div>
   </div>
 
   <div class="search-section" [class.search-active]="hasSearched">
-
     <div class="search-input-wrapper product-input">
-      <input type="text" placeholder="Producto (ej: Aceite, Azúcar, Cemento)..."
+      <input type="text" placeholder="Producto (ej: Aceite, Azúcar)..."
              class="search-input" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
-
-      <div class="search-error-tooltip" *ngIf="productError">
-        {{ productError }}
-      </div>
+      <div class="search-error-tooltip" *ngIf="productError">{{ productError }}</div>
     </div>
 
     <div class="search-input-wrapper quantity-input">
-      <input type="number" placeholder="Cant." class="search-input hide-spin-buttons"
-             min="1" [(ngModel)]="quantity" (keyup.enter)="onSearch()">
+      <input type="number"
+             placeholder="Cant."
+             class="search-input hide-spin-buttons"
+             min="1"
+             [(ngModel)]="quantity"
+             (keydown)="preventInvalidCharacters($event)"
+             (keyup.enter)="onSearch()">
+
+      <div class="search-error-tooltip" *ngIf="quantityError">
+        {{ quantityError }}
+      </div>
     </div>
 
     <div class="search-input-wrapper measure-select">
@@ -84,7 +100,7 @@
         <optgroup label="Peso">
           <option value="toneladas">Toneladas (t)</option>
           <option value="quintales">Quintales (qq)</option>
-          <option value="arrobas">Arrobas (@)</option>
+          <option value="arrobas">Arroas (@)</option>
           <option value="kilogramos">Kilogramos (kg)</option>
           <option value="libras">Libras (lb)</option>
         </optgroup>
@@ -110,7 +126,9 @@
       </div>
     </div>
 
-    <button class="search-button" (click)="onSearch()">
+    <button class="search-button" (click)="onSearch()" [disabled]="isLoading">
+      <span class="loading-tooltip" *ngIf="isLoading">Espera que termine la búsqueda</span>
+
       <span *ngIf="!hasSearched">Cotizar</span>
       <img *ngIf="hasSearched" src="assets/images/logopequ.png" alt="Buscar" class="search-button-icon">
     </button>
