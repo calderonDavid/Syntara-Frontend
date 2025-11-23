@@ -1,6 +1,6 @@
 <main class="cart-container">
 
-  <h2 *ngIf="cartItems.length > 0 || isLoading">
+  <h2 *ngIf="!isLoading">
     Tu Carrito <span *ngIf="totalCount > 0">({{ totalCount }} productos)</span>
   </h2>
 
@@ -43,50 +43,64 @@
     </a>
   </div>
 
-  <div *ngIf="!isLoading && cartItems.length > 0" class="cart-content">
+  <div *ngIf="!isLoading && !cartError && cartItems.length > 0" class="cart-content">
 
     <div class="items-list">
       <div *ngFor="let item of cartItems" class="cart-item">
         <div class="item-info">
-          <div class="store-tag">{{ item.store }}</div>
+          <span class="store-badge">{{ item.store }}</span>
           <h3>{{ item.product }}</h3>
           <div class="item-meta">
-            <span>Cant: <strong>{{ item.quantity }} {{ item.unit }}</strong></span>
-            <a *ngIf="item.url" [href]="item.url" target="_blank" class="link">Ver tienda ↗</a>
+            <span>Cantidad: <strong>{{ item.quantity }} {{ item.unit }}</strong></span>
+            <a *ngIf="item.url" [href]="item.url" target="_blank" class="link">Ver en tienda ↗</a>
           </div>
         </div>
 
         <div class="item-pricing">
           <span class="total-item-price">$ {{ (item.price * item.quantity) | number:'1.0-0' }}</span>
-          <small>($ {{ item.price | number:'1.0-0' }} c/u)</small>
+          <small class="unit-price">($ {{ item.price | number:'1.0-0' }} c/u)</small>
 
-          <button (click)="removeItem(item._id)" class="delete-btn" title="Eliminar">
-            🗑️
+          <button (click)="askDeleteItem(item._id, item.product)" class="delete-btn" title="Eliminar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
           </button>
         </div>
       </div>
     </div>
 
     <div class="cart-summary">
-      <h3>Resumen de Pago</h3>
-
+      <h3>Resumen del Pedido</h3>
       <div class="summary-row">
         <span>Subtotal</span>
         <span>$ {{ totalPrice | number:'1.0-0' }}</span>
       </div>
-
       <div class="summary-divider"></div>
-
       <div class="summary-row total">
-        <span>Total a Pagar</span>
+        <span>Total</span>
         <span class="final-price">$ {{ totalPrice | number:'1.0-0' }}</span>
       </div>
+      <button class="checkout-btn">Finalizar Compra</button>
 
-      <div class="summary-actions">
-        <button class="checkout-btn">Finalizar Compra</button>
-        <button (click)="clearCart()" class="clear-btn">Vaciar Carrito</button>
-      </div>
+      <button (click)="askClearCart()" class="clear-btn">Vaciar Carrito</button>
     </div>
 
   </div>
+
+  <div *ngIf="showModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e67e22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      </div>
+      <h3>Confirmación</h3>
+      <p>{{ modalMessage }}</p>
+
+      <div class="modal-buttons">
+        <button (click)="closeModal()" class="modal-btn cancel" [disabled]="isProcessing">Cancelar</button>
+        <button (click)="confirmAction()" class="modal-btn confirm" [disabled]="isProcessing">
+          <span *ngIf="!isProcessing">Sí, eliminar</span>
+          <span *ngIf="isProcessing">Procesando...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
 </main>

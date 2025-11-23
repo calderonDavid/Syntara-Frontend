@@ -28,7 +28,7 @@ export interface SearchResult {
 })
 
 export class SearchService {
-  private apiUrl = 'http://192.168.4.217:3000/api/search';
+  private apiUrl = 'http://10.195.23.48:3000/api/search';
 
   constructor(private http: HttpClient) {
   }

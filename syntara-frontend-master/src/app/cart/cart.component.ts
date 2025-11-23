@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../api.service';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
@@ -14,10 +14,20 @@ export class CartComponent implements OnInit {
   cartItems: any[] = [];
   totalPrice: number = 0;
   totalCount: number = 0;
-  isLoading: boolean = true;
+  isLoading: boolean = false;
   cartError: string | null = null;
 
-  constructor(private apiService: ApiService) {}
+  // VARIABLES PARA EL MODAL (POP-UP)
+  showModal: boolean = false;
+  modalMessage: string = '';
+  actionType: 'delete' | 'clear' | null = null; // Qué vamos a hacer: borrar uno o vaciar todo
+  itemToDeleteId: string | null = null;
+  isProcessing: boolean = false; // Para mostrar spinner en el botón del modal
+
+  constructor(
+    private apiService: ApiService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadCart();
@@ -28,52 +38,84 @@ export class CartComponent implements OnInit {
     this.cartError = null;
 
     this.apiService.getCart().subscribe({
-      next: (data) => {
-        console.log('📥 Datos recibidos del carrito:', data); // <--- ¡MIRA LA CONSOLA!
-
-        // Verificamos si data tiene la estructura esperada
-        if (data && data.items) {
-          this.cartItems = data.items;
-          this.totalPrice = data.totalPrice || 0;
-          this.totalCount = data.totalCount || 0;
+      next: (response: any) => {
+        const payload = response.data || response;
+        if (payload && Array.isArray(payload.items)) {
+          this.cartItems = payload.items;
+          this.totalPrice = Number(payload.totalPrice) || 0;
+          this.totalCount = Number(payload.totalCount) || 0;
         } else {
-          // Si llega vacío o diferente, inicializamos en 0
           this.cartItems = [];
           this.totalPrice = 0;
           this.totalCount = 0;
         }
-
         this.isLoading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('❌ Error cargando carrito:', err);
-        this.cartError = 'No se pudo cargar tu carrito. Revisa tu conexión.';
         this.isLoading = false;
+        if (err.status === 404) { this.cartItems = []; return; }
+        if (err.status === 401) { this.cartError = 'Tu sesión expiró.'; return; }
+        this.cartError = 'No se pudo cargar el carrito.';
       }
     });
   }
 
-  removeItem(itemId: string) {
-    if (!confirm('¿Deseas eliminar este producto?')) return;
+  // --- FUNCIONES DEL MODAL ---
 
-    this.apiService.removeFromCart(itemId).subscribe({
-      next: () => {
-        this.loadCart(); // Recargamos para actualizar lista y total
-      },
-      error: (err) => console.error('Error eliminando:', err)
-    });
+  // 1. Preguntar antes de eliminar UN producto
+  askDeleteItem(itemId: string, productName: string) {
+    this.modalMessage = `¿Estás seguro de eliminar "${productName}"?`;
+    this.actionType = 'delete';
+    this.itemToDeleteId = itemId;
+    this.showModal = true;
   }
 
-  clearCart() {
-    if (!confirm('¿Vaciar todo el carrito?')) return;
+  // 2. Preguntar antes de vaciar TODO
+  askClearCart() {
+    this.modalMessage = '¿Seguro que quieres vaciar todo tu carrito?';
+    this.actionType = 'clear';
+    this.showModal = true;
+  }
 
-    this.apiService.clearCart().subscribe({
-      next: () => {
-        this.cartItems = [];
-        this.totalPrice = 0;
-        this.totalCount = 0;
-      },
-      error: (err) => console.error(err)
-    });
+  // 3. Cancelar y cerrar
+  closeModal() {
+    this.showModal = false;
+    this.actionType = null;
+    this.itemToDeleteId = null;
+    this.isProcessing = false;
+  }
+
+  // 4. Confirmar y ejecutar la acción
+  confirmAction() {
+    this.isProcessing = true;
+
+    if (this.actionType === 'delete' && this.itemToDeleteId) {
+      // Eliminar Item
+      this.apiService.removeFromCart(this.itemToDeleteId).subscribe({
+        next: () => {
+          this.loadCart(); // Recargar visualmente
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error(err);
+          this.closeModal();
+        }
+      });
+    } else if (this.actionType === 'clear') {
+      // Vaciar Carrito
+      this.apiService.clearCart().subscribe({
+        next: () => {
+          this.cartItems = [];
+          this.totalPrice = 0;
+          this.totalCount = 0;
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error(err);
+          this.closeModal();
+        }
+      });
+    }
   }
 }
