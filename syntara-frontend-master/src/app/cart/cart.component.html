@@ -1,38 +1,56 @@
 <main class="cart-container">
+  <!-- Título principal (Solo visible si hay contenido o cargando) -->
   <h2 *ngIf="cartItems.length > 0 || isLoading">🛒 Tu Carrito de Compras</h2>
 
+  <!-- Estado de Carga -->
   <div *ngIf="isLoading" class="loading-container">
     <div class="spinner"></div>
     <p>Cargando tu carrito...</p>
   </div>
 
+  <!-- Mensajes de Error -->
   <div *ngIf="cartError" class="error-message">
     {{ cartError }}
   </div>
 
-  <!-- ESTADO VACÍO (DISEÑO MEJORADO) -->
+  <!-- ESTADO VACÍO (Diseño idéntico a "No Results" del Home) -->
   <div *ngIf="!isLoading && cartItems.length === 0" class="empty-cart-container">
     <div class="icon-wrapper">
-      <!-- Icono de carrito con línea (Ghost Cart) -->
+      <!-- Icono animado estilo "No Results" -->
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="empty-cart-icon">
-        <circle cx="8" cy="21" r="1"></circle>
-        <circle cx="19" cy="21" r="1"></circle>
-        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-        <line x1="3" y1="3" x2="21" y2="21"></line> <!-- Línea diagonal -->
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        <line x1="3" y1="3" x2="21" y2="21"></line>
       </svg>
     </div>
-    <h3>¡Tu carrito está vacío!</h3>
+
+    <h3>Tu carrito está vacío</h3>
+
     <p>
-      Parece que aún no has agregado productos para comparar.<br>
-      ¡Explora y encuentra los mejores precios ahora mismo!
+      Aún no has agregado productos para comparar.<br>
+      <strong>¡Empieza a buscar y ahorra dinero!</strong>
     </p>
+
+    <!-- Sección de sugerencias (Estilo idéntico al Home) -->
+    <div class="suggestions">
+      <span>¿Qué tal si buscas?</span>
+      <ul>
+        <li>Canasta familiar (Arroz, Aceite, Huevos)</li>
+        <li>Tecnología (Celulares, Portátiles)</li>
+        <li>Aseo del hogar</li>
+      </ul>
+    </div>
+
     <a routerLink="/" class="start-shopping-btn">
       Ir a Buscar Productos
     </a>
   </div>
 
-  <!-- CONTENIDO DEL CARRITO (SI HAY ÍTEMS) -->
+  <!-- CONTENIDO DEL CARRITO (Si hay productos) -->
   <div *ngIf="!isLoading && cartItems.length > 0" class="cart-content">
+
+    <!-- Lista de Items -->
     <div class="cart-items">
       <div class="cart-item" *ngFor="let item of cartItems">
         <div class="item-details">
@@ -41,7 +59,8 @@
             <span class="store-icon">🏪</span> {{ item.store }}
           </div>
           <a [href]="item.url" target="_blank" class="link-external">
-            Ver en tienda <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            Ver en tienda
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
           </a>
         </div>
 
@@ -57,6 +76,7 @@
       </div>
     </div>
 
+    <!-- Resumen de Compra -->
     <div class="cart-summary">
       <h3>Resumen de Compra</h3>
       <div class="summary-row">
