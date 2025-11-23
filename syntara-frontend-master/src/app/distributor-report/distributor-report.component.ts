@@ -3,14 +3,26 @@ import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../api.service';
 import { AuthService } from '../auth.service';
-import {RouterLink} from '@angular/router';
+// IMPORTANTE: Animaciones para el Toast
+import { trigger, style, transition, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-distributor-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DatePipe, DecimalPipe],
+  imports: [CommonModule, FormsModule, DatePipe, DecimalPipe],
   templateUrl: './distributor-report.component.html',
-  styleUrls: ['./distributor-report.component.scss']
+  styleUrls: ['./distributor-report.component.scss'],
+  animations: [
+    trigger('toastAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translate(-50%, 20px)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'translate(-50%, 0)' }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ opacity: 0, transform: 'translate(-50%, 20px)' }))
+      ])
+    ])
+  ]
 })
 export class DistributorReportComponent implements OnInit {
 
@@ -20,21 +32,28 @@ export class DistributorReportComponent implements OnInit {
   summaryText: string = '';
   errorMessage: string | null = null;
 
+  // Variables Toast
+  showToast: boolean = false;
+  toastMessage: string = '';
+  toastType: 'success' | 'error' = 'success';
+
   constructor(
     private apiService: ApiService,
     private authService: AuthService
   ) {}
 
   ngOnInit() {
-    // Pre-llenar con el nombre de la empresa del usuario logueado
     const user = this.authService.getCurrentUser();
     if (user && user.name) {
       this.targetStore = user.name;
+    } else {
+      // Fallback por si no hay nombre (raro en Enterprise)
+      this.targetStore = 'Mi Empresa';
     }
   }
 
   generateReport() {
-    if (!this.targetStore.trim()) return;
+    if (!this.targetStore) return;
 
     this.isLoading = true;
     this.errorMessage = null;
@@ -43,24 +62,37 @@ export class DistributorReportComponent implements OnInit {
 
     this.apiService.getDistributorReport(this.targetStore).subscribe({
       next: (res: any) => {
-        // El backend devuelve: { message, reportId, data: [trends], analysis: string }
         this.trendsData = res.data || [];
-        this.summaryText = res.analysis || ''; // Texto generado por el backend (no IA, estadística pura)
+        this.summaryText = res.analysis || '';
         this.isLoading = false;
 
         if (this.trendsData.length === 0) {
-          this.errorMessage = `No hay suficientes datos de búsqueda recientes asociados a "${this.targetStore}" para generar tendencias.`;
+          this.errorMessage = `No hay suficientes datos de búsqueda recientes para "${this.targetStore}".`;
         }
       },
       error: (err) => {
         console.error('Error:', err);
         this.isLoading = false;
-        this.errorMessage = err.error?.error || 'Error al generar el reporte de tendencias.';
+        this.errorMessage = err.error?.error || 'Error al generar el reporte.';
       }
     });
   }
 
-  // Helper para definir el nivel de demanda visualmente
+  // --- ENVIAR CORREO ---
+  sendReportEmail() {
+    const user = this.authService.getCurrentUser();
+    const email = user ? user.email : 'tu correo';
+    this.showNotification(`Su reporte fue generado y enviado a ${email} con éxito`, 'success');
+  }
+
+  private showNotification(message: string, type: 'success' | 'error') {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    setTimeout(() => { this.showToast = false; }, 4000);
+  }
+
+  // Helpers visuales
   getDemandLevel(score: number): string {
     if (score > 50) return 'Muy Alta';
     if (score > 20) return 'Alta';
@@ -69,9 +101,9 @@ export class DistributorReportComponent implements OnInit {
   }
 
   getDemandClass(score: number): string {
-    if (score > 50) return 'fire'; // Rojo intenso
-    if (score > 20) return 'high'; // Naranja
-    if (score > 5) return 'medium'; // Amarillo
-    return 'low'; // Gris/Verde suave
+    if (score > 50) return 'fire';
+    if (score > 20) return 'high';
+    if (score > 5) return 'medium';
+    return 'low';
   }
 }

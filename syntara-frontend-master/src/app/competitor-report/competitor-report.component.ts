@@ -12,7 +12,7 @@ import { trigger, style, transition, animate } from '@angular/animations';
 @Component({
   selector: 'app-competitor-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DatePipe, DecimalPipe],
+  imports: [CommonModule, FormsModule, DatePipe, DecimalPipe],
   templateUrl: './competitor-report.component.html',
   styleUrls: ['./competitor-report.component.scss'],
   // AGREGAR ANIMACIÓN DEL TOAST

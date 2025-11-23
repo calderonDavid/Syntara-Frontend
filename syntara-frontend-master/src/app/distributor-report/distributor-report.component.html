@@ -3,27 +3,23 @@
   <div class="header-section">
     <div class="title-badge">Enterprise Feature</div>
     <h2>Tendencias y Planeación</h2>
-    <p>Descubre qué productos están buscando más los usuarios y cómo se comportan sus precios.</p>
+    <p>Descubre qué productos están buscando más los usuarios.</p>
   </div>
 
   <div class="config-card">
-    <div class="input-wrapper">
-      <label>Analizar demanda para:</label>
-      <div class="search-row">
-        <div class="input-icon-wrap">
-          <span class="icon">🏢</span>
-          <input
-            type="text"
-            [(ngModel)]="targetStore"
-            placeholder="Nombre de tu empresa..."
-            (keyup.enter)="generateReport()">
+    <div class="info-row">
+      <div class="company-badge">
+        <span class="icon">🏢</span>
+        <div class="text-info">
+          <span class="label">Analizando demanda para:</span>
+          <h3>{{ targetStore }}</h3>
         </div>
-
-        <button (click)="generateReport()" [disabled]="isLoading || !targetStore" class="generate-btn">
-          <span *ngIf="!isLoading">Generar Tendencias</span>
-          <div *ngIf="isLoading" class="spinner-small"></div>
-        </button>
       </div>
+
+      <button (click)="generateReport()" [disabled]="isLoading" class="generate-btn">
+        <span *ngIf="!isLoading">Analizar Tendencias</span>
+        <div *ngIf="isLoading" class="spinner-small"></div>
+      </button>
     </div>
   </div>
 
@@ -52,7 +48,7 @@
 
         <div class="stats-row">
           <div class="stat-item">
-            <span class="label">Precio Promedio</span>
+            <span class="label">Promedio</span>
             <span class="value main">$ {{ item.priceStats.avg | number:'1.0-0' }}</span>
           </div>
           <div class="stat-divider"></div>
@@ -68,15 +64,25 @@
         </div>
 
         <div class="card-footer">
-          <small>Última búsqueda registrada: {{ item.lastSearch | date:'mediumDate' }}</small>
+          <small>Última búsqueda: {{ item.lastSearch | date:'mediumDate' }}</small>
         </div>
       </div>
     </div>
 
+    <div class="actions-footer">
+      <button class="send-report-btn" (click)="sendReportEmail()">
+        Enviar Reporte a Correo ✉️
+      </button>
+    </div>
+
   </div>
 
-  <div class="bottom-nav">
-    <a routerLink="/" class="back-link">← Volver al Inicio</a>
+  <div *ngIf="showToast" class="custom-toast" [ngClass]="toastType" [@toastAnimation]>
+    <div class="toast-icon">
+      <svg *ngIf="toastType === 'success'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      <svg *ngIf="toastType === 'error'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+    </div>
+    <span class="toast-text">{{ toastMessage }}</span>
   </div>
 
 </main>
