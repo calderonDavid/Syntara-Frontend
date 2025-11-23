@@ -47,6 +47,12 @@ export const routes: Routes = [
     data: { animation: 'CartPage' }
   },
   {
+    path: 'competitor-report',
+    component: CompetitorReportComponent,
+    canActivate: [authGuard],
+    data: { animation: 'ReportPage' }
+  },
+  {
     path: 'history',
     component: HistoryComponent,
     canActivate: [authGuard],

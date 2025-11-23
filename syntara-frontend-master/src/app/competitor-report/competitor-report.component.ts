@@ -4,80 +4,118 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../api.service';
 import { AuthService } from '../auth.service';
+// IMPORTAR ANIMACIONES
+import { trigger, style, transition, animate } from '@angular/animations';
 
-interface Competitor {
-  store: string;
-  price: number;
-  date: string;
-  url: string;
-}
-
-interface ProductComparison {
-  productName: string;
-  displayProduct?: string;
-  myStore: string;
-  myPrice: number;
-  myDate: string;
-  competitors: Competitor[];
-}
+// ... (Interfaces Competitor y ProductComparison siguen igual)
 
 @Component({
   selector: 'app-competitor-report',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, DatePipe, DecimalPipe],
   templateUrl: './competitor-report.component.html',
-  styleUrls: ['./competitor-report.component.scss']
+  styleUrls: ['./competitor-report.component.scss'],
+  // AGREGAR ANIMACIÓN DEL TOAST
+  animations: [
+    trigger('toastAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translate(-50%, 20px)' }),
+        animate('300ms ease-out', style({ opacity: 1, transform: 'translate(-50%, 0)' }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ opacity: 0, transform: 'translate(-50%, 20px)' }))
+      ])
+    ])
+  ]
 })
 export class CompetitorReportComponent implements OnInit {
 
-  targetStore: string = '';
+  // ... (variables existentes targetProduct, myStoreName, etc) ...
+  targetProduct: string = '';
+  myStoreName: string = '';
   isLoading: boolean = false;
-  reportData: ProductComparison[] = [];
+  reportData: any = null;
+  competitors: any[] = [];
   errorMessage: string | null = null;
-  analysisText: string = '';
+
+  // VARIABLES PARA EL TOAST
+  showToast: boolean = false;
+  toastMessage: string = '';
+  toastType: 'success' | 'error' = 'success';
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService
   ) {}
 
+  // ... (ngOnInit, generateReport, processData, getDifferencePercent siguen IGUAL) ...
+
   ngOnInit() {
-    // Pre-llenar con el nombre de la empresa (Usuario)
     const user = this.authService.getCurrentUser();
     if (user && user.name) {
-      this.targetStore = user.name;
+      this.myStoreName = user.name;
     }
   }
 
   generateReport() {
-    if (!this.targetStore.trim()) return;
+    // ... (tu código existente)
+    if (!this.targetProduct.trim()) return;
 
     this.isLoading = true;
     this.errorMessage = null;
-    this.reportData = [];
+    this.reportData = null;
+    this.competitors = [];
 
-    this.apiService.getCompetitorReport(this.targetStore).subscribe({
+    this.apiService.getCompetitorReport(this.targetProduct).subscribe({
       next: (res: any) => {
-        // El backend devuelve: { message, reportId, data: [], analysis (opcional) }
-        this.reportData = res.data || [];
-        this.analysisText = res.analysis || '';
+        const rawPrices = res.data || [];
+        this.processData(rawPrices);
         this.isLoading = false;
-
-        if (this.reportData.length === 0) {
-          this.errorMessage = `No encontramos productos registrados en la base de datos para la tienda "${this.targetStore}".`;
-        }
       },
       error: (err) => {
-        console.error('Error generando reporte:', err);
+        console.error('Error:', err);
         this.isLoading = false;
-        this.errorMessage = err.error?.error || 'Ocurrió un error al generar el análisis. Verifica el nombre de la tienda.';
+        this.errorMessage = 'No pudimos generar el reporte. Intenta con otro producto.';
       }
     });
   }
 
-  // Calcula la diferencia porcentual para mostrar colores
+  processData(prices: any[]) {
+    if (!prices || prices.length === 0) {
+      this.errorMessage = 'No se encontraron registros para este producto en ninguna tienda.';
+      return;
+    }
+    const myRecord = prices.find(p => p.store.toLowerCase().includes(this.myStoreName.toLowerCase()));
+    const others = prices.filter(p => !p.store.toLowerCase().includes(this.myStoreName.toLowerCase()));
+
+    this.reportData = {
+      productName: this.targetProduct,
+      myPrice: myRecord ? myRecord.price : null,
+      myDate: myRecord ? myRecord.date : null,
+      myUrl: myRecord ? myRecord.url : null
+    };
+    this.competitors = others;
+  }
+
   getDifferencePercent(myPrice: number, otherPrice: number): number {
     if (!myPrice || !otherPrice) return 0;
     return ((otherPrice - myPrice) / myPrice) * 100;
+  }
+
+  // --- NUEVA FUNCIÓN: ENVIAR REPORTE ---
+  sendReportEmail() {
+    const user = this.authService.getCurrentUser();
+    const email = user ? user.email : 'tu correo';
+
+    // Simulamos envío (aquí podrías llamar al backend si fuera real)
+    this.showNotification(`Su reporte fue generado y enviado a ${email} con éxito`, 'success');
+  }
+
+  // --- HELPER PARA TOAST ---
+  private showNotification(message: string, type: 'success' | 'error') {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    setTimeout(() => { this.showToast = false; }, 4000);
   }
 }

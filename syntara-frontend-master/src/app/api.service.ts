@@ -93,8 +93,9 @@ export class ApiService {
     return this.http.put(`${this.baseUrl}/users/update`, data);
   }
   //REPORTE COMPETENCIA
-  getCompetitorReport(storeName: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/reports/company-monitor`, { storeName });
+  getCompetitorReport(query: string): Observable<any> {
+    // Usamos el endpoint de comparación de precios
+    return this.http.post(`${this.baseUrl}/reports/generate`, { product: query });
   }
 }
 

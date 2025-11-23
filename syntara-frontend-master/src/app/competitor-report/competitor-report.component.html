@@ -1,75 +1,105 @@
 <main class="report-container">
 
   <div class="header-section">
-    <a routerLink="/" class="back-btn">← Volver</a>
-    <h2>⚔️ Monitor de Competencia</h2>
-    <p>Compara tus precios históricos contra el mercado en tiempo real.</p>
+    <div class="title-badge">Enterprise Feature</div>
+    <h2>Monitor de Competencia</h2>
+    <p>Analiza el precio de un producto específico frente al mercado.</p>
   </div>
 
   <div class="config-card">
-    <label>Analizar tienda:</label>
-    <div class="search-row">
-      <input
-        type="text"
-        [(ngModel)]="targetStore"
-        placeholder="Ej: Exito, Jumbo, Alkosto..."
-        (keyup.enter)="generateReport()">
+    <div class="input-wrapper">
+      <label for="prodInput">Producto a analizar</label>
+      <div class="search-row">
+        <div class="input-icon-wrap">
+          <span class="icon">🔍</span>
+          <input
+            id="prodInput"
+            type="text"
+            [(ngModel)]="targetProduct"
+            placeholder="Ej: Arroz Diana, Iphone 15..."
+            (keyup.enter)="generateReport()">
+        </div>
 
-      <button (click)="generateReport()" [disabled]="isLoading || !targetStore">
-        <span *ngIf="!isLoading">Generar Análisis</span>
-        <span *ngIf="isLoading" class="spinner-small"></span>
-      </button>
+        <button (click)="generateReport()" [disabled]="isLoading || !targetProduct" class="generate-btn">
+          <span *ngIf="!isLoading">Analizar Producto</span>
+          <div *ngIf="isLoading" class="spinner-small"></div>
+        </button>
+      </div>
+      <small class="hint">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        Comparando precios contra tu tienda: <strong>{{ myStoreName }}</strong>
+      </small>
     </div>
-    <small>Nota: El nombre debe coincidir con cómo aparece la tienda en los registros de búsqueda.</small>
   </div>
 
   <div *ngIf="errorMessage" class="error-banner">
-    {{ errorMessage }}
+    <div class="error-icon">⚠️</div>
+    <span>{{ errorMessage }}</span>
   </div>
 
-  <div *ngIf="!isLoading && reportData.length > 0" class="results-grid">
+  <div *ngIf="!isLoading && reportData" class="results-section">
 
-    <div *ngIf="analysisText" class="ai-summary-card">
-      <h4>🤖 Insights de Syntara</h4>
-      <p>{{ analysisText }}</p>
-    </div>
+    <div class="main-product-card">
 
-    <div class="product-card" *ngFor="let item of reportData">
-      <div class="card-header">
-        <h3>{{ item.displayProduct || item.productName }}</h3>
-        <span class="my-price-badge">
-          Tu precio: <strong>$ {{ item.myPrice | number:'1.0-0' }}</strong>
-          <br><small>{{ item.myDate | date:'shortDate' }}</small>
-        </span>
-      </div>
-
-      <div class="competitors-list">
-        <div *ngIf="item.competitors.length === 0" class="no-competitors">
-          No se encontraron datos recientes de la competencia para este producto.
+      <div class="card-content-top">
+        <div class="product-info">
+          <h3>{{ reportData.productName }}</h3>
+          <span class="subtitle">Tu posición en el mercado</span>
         </div>
 
-        <div *ngFor="let comp of item.competitors" class="comp-row">
-          <div class="comp-info">
-            <span class="store-name">{{ comp.store }}</span>
-            <span class="date">{{ comp.date | date:'MMM d' }}</span>
-          </div>
+        <div class="my-price-display" [class.missing]="!reportData.myPrice">
+          <span class="label">Tu Precio Actual</span>
+          <span class="price" *ngIf="reportData.myPrice">$ {{ reportData.myPrice | number:'1.0-0' }}</span>
+          <span class="price-missing" *ngIf="!reportData.myPrice">No vendes este producto</span>
+          <span class="date" *ngIf="reportData.myDate">Actualizado: {{ reportData.myDate | date:'mediumDate' }}</span>
+        </div>
+      </div>
 
-          <div class="comp-price-box">
-            <span class="price">$ {{ comp.price | number:'1.0-0' }}</span>
+      <div class="card-actions">
+        <button class="send-report-btn" (click)="sendReportEmail()">
+          Enviar Reporte a Correo ✉️
+        </button>
+      </div>
 
-            <span class="badge"
-                  [class.cheaper]="comp.price < item.myPrice"
-                  [class.expensive]="comp.price > item.myPrice"
-                  [class.equal]="comp.price === item.myPrice">
+    </div>
 
-              <span *ngIf="comp.price < item.myPrice">▼ {{ getDifferencePercent(item.myPrice, comp.price) | number:'1.0-0' }}%</span>
-              <span *ngIf="comp.price > item.myPrice">▲ +{{ getDifferencePercent(item.myPrice, comp.price) | number:'1.0-0' }}%</span>
-              <span *ngIf="comp.price === item.myPrice">= Igual</span>
+    <div class="competitors-grid">
+      <h4 class="grid-title">Precios en la Competencia ({{ competitors.length }})</h4>
+
+      <div class="comp-card" *ngFor="let comp of competitors">
+        <div class="comp-header">
+          <span class="store-name">{{ comp.store }}</span>
+          <span class="date">{{ comp.date | date:'MMM d' }}</span>
+        </div>
+
+        <div class="comp-body">
+          <span class="comp-price">$ {{ comp.price | number:'1.0-0' }}</span>
+
+          <ng-container *ngIf="reportData.myPrice">
+            <span class="badge cheaper" *ngIf="comp.price < reportData.myPrice">
+              ▼ {{ getDifferencePercent(reportData.myPrice, comp.price) | number:'1.0-0' }}%
             </span>
-          </div>
+            <span class="badge expensive" *ngIf="comp.price > reportData.myPrice">
+              ▲ +{{ getDifferencePercent(reportData.myPrice, comp.price) | number:'1.0-0' }}%
+            </span>
+            <span class="badge equal" *ngIf="comp.price === reportData.myPrice">
+              = Igual
+            </span>
+          </ng-container>
         </div>
+
+        <a *ngIf="comp.url" [href]="comp.url" target="_blank" class="view-link">Ver en tienda</a>
       </div>
     </div>
 
   </div>
+
+  <div *ngIf="showToast" class="custom-toast" [ngClass]="toastType" [@toastAnimation]>
+    <div class="toast-icon">
+      <svg *ngIf="toastType === 'success'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      <svg *ngIf="toastType === 'error'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+    </div>
+    <span class="toast-text">{{ toastMessage }}</span>
+  </div>
+
 </main>
