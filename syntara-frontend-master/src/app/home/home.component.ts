@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import {Router, RouterLink, RouterModule} from '@angular/router';
 import { AuthService } from '../auth.service';
 import { SearchResult } from '../search.service';
 import { ApiService } from '../api.service';
@@ -16,7 +16,7 @@ interface VolumeItem {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, TypewriterDirective],
+  imports: [CommonModule, FormsModule, DatePipe, TypewriterDirective, RouterLink],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   animations: [

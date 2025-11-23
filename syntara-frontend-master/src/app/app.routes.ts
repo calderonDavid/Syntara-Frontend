@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import {CartComponent} from './cart/cart.component';
 import { CompetitorReportComponent } from './competitor-report/competitor-report.component';
+import { DistributorReportComponent } from './distributor-report/distributor-report.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
@@ -49,6 +50,12 @@ export const routes: Routes = [
   {
     path: 'competitor-report',
     component: CompetitorReportComponent,
+    canActivate: [authGuard],
+    data: { animation: 'ReportPage' }
+  },
+  {
+    path: 'distributor-report',
+    component: DistributorReportComponent,
     canActivate: [authGuard],
     data: { animation: 'ReportPage' }
   },

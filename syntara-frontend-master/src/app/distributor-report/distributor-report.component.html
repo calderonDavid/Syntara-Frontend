@@ -1,0 +1,82 @@
+<main class="report-container">
+
+  <div class="header-section">
+    <div class="title-badge">Enterprise Feature</div>
+    <h2>Tendencias y Planeación</h2>
+    <p>Descubre qué productos están buscando más los usuarios y cómo se comportan sus precios.</p>
+  </div>
+
+  <div class="config-card">
+    <div class="input-wrapper">
+      <label>Analizar demanda para:</label>
+      <div class="search-row">
+        <div class="input-icon-wrap">
+          <span class="icon">🏢</span>
+          <input
+            type="text"
+            [(ngModel)]="targetStore"
+            placeholder="Nombre de tu empresa..."
+            (keyup.enter)="generateReport()">
+        </div>
+
+        <button (click)="generateReport()" [disabled]="isLoading || !targetStore" class="generate-btn">
+          <span *ngIf="!isLoading">Generar Tendencias</span>
+          <div *ngIf="isLoading" class="spinner-small"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    <div class="error-icon">📉</div>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div *ngIf="!isLoading && trendsData.length > 0" class="results-section">
+
+    <div class="summary-card" *ngIf="summaryText">
+      <h4>📊 Resumen de Datos</h4>
+      <p>{{ summaryText }}</p>
+    </div>
+
+    <div class="trends-grid">
+      <div class="trend-card" *ngFor="let item of trendsData">
+
+        <div class="trend-header">
+          <div class="rank-badge">#{{ item.demandScore }} Búsquedas</div>
+          <h3>{{ item.product | titlecase }}</h3>
+          <span class="demand-tag" [ngClass]="getDemandClass(item.demandScore)">
+            Demanda {{ getDemandLevel(item.demandScore) }}
+          </span>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="label">Precio Promedio</span>
+            <span class="value main">$ {{ item.priceStats.avg | number:'1.0-0' }}</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="label">Mínimo</span>
+            <span class="value min">$ {{ item.priceStats.min | number:'1.0-0' }}</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="label">Máximo</span>
+            <span class="value max">$ {{ item.priceStats.max | number:'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <small>Última búsqueda registrada: {{ item.lastSearch | date:'mediumDate' }}</small>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <a routerLink="/" class="back-link">← Volver al Inicio</a>
+  </div>
+
+</main>

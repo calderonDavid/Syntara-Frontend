@@ -97,5 +97,9 @@ export class ApiService {
     // Usamos el endpoint de comparación de precios
     return this.http.post(`${this.baseUrl}/reports/generate`, { product: query });
   }
+  //REPORTE TENDENCIA
+  getDistributorReport(storeName: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/reports/distributor-intelligence`, { storeName });
+  }
 }
 
