@@ -1,0 +1,119 @@
+<main class="main-content" [class.active-view]="hasSearched">
+
+  <div class="intro-section" *ngIf="!hasSearched">
+    <div class="header-badge">Enterprise Feature</div>
+    <h2 class="search-prompt">Cotizador de Precios por Volumen</h2>
+    <p class="subtitle">Busca productos en grandes formatos para abastecer tu negocio.</p>
+  </div>
+
+  <div class="results-section" *ngIf="hasSearched">
+    <h2 class="results-title">
+      <span [appTypewriter]="resultsTitleText" [typingSpeed]="40"></span>
+    </h2>
+
+    <div *ngIf="isLoading" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>Consultando distribuidores mayoristas...</p>
+    </div>
+
+    <div *ngIf="generalError && !isLoading" class="error-message">
+      <p>{{ generalError }}</p>
+    </div>
+
+    <div class="results-table-container" *ngIf="!isLoading && results.length > 0">
+      <table class="results-table">
+        <thead>
+        <tr>
+          <th>PROVEEDOR</th>
+          <th>PRODUCTO</th>
+          <th>PRECIO TOTAL</th>
+          <th>ACCIÓN</th>
+          <th>FECHA</th>
+        </tr>
+        </thead>
+        <tbody [@listAnimation]="results.length">
+        <tr *ngFor="let item of results">
+          <td class="store-name">{{ item.store }}</td>
+          <td class="product-name">{{ item.product }}</td>
+          <td class="price-col" [class.offer-price]="item.isOffer">
+            $ {{ item.price | number:'1.0-0' }}
+          </td>
+          <td>
+            <a [href]="item.url" target="_blank" class="store-link">Ver Oferta</a>
+          </td>
+          <td>{{ item.date | date:'shortDate' }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="no-results-container" *ngIf="!isLoading && results.length === 0 && !generalError">
+      <h3>No encontramos ofertas mayoristas</h3>
+      <p>Intenta buscar "Arroz" en vez de una referencia muy específica.</p>
+    </div>
+  </div>
+
+  <div class="search-section" [class.search-active]="hasSearched">
+
+    <div class="search-input-wrapper product-input">
+      <input type="text" placeholder="Producto (ej: Aceite, Azúcar, Cemento)..."
+             class="search-input" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+
+      <div class="search-error-tooltip" *ngIf="productError">
+        {{ productError }}
+      </div>
+    </div>
+
+    <div class="search-input-wrapper quantity-input">
+      <input type="number" placeholder="Cant." class="search-input hide-spin-buttons"
+             min="1" [(ngModel)]="quantity" (keyup.enter)="onSearch()">
+    </div>
+
+    <div class="search-input-wrapper measure-select">
+      <select class="search-input" [(ngModel)]="measure">
+        <option value="" disabled selected>Unidad / Formato</option>
+
+        <optgroup label="Empaques">
+          <option value="bultos">Bultos / Sacos</option>
+          <option value="cajas">Cajas</option>
+          <option value="pacas">Pacas</option>
+          <option value="canastillas">Canastillas</option>
+          <option value="fardos">Fardos</option>
+        </optgroup>
+
+        <optgroup label="Peso">
+          <option value="toneladas">Toneladas (t)</option>
+          <option value="quintales">Quintales (qq)</option>
+          <option value="arrobas">Arrobas (@)</option>
+          <option value="kilogramos">Kilogramos (kg)</option>
+          <option value="libras">Libras (lb)</option>
+        </optgroup>
+
+        <optgroup label="Volumen">
+          <option value="galones">Galones</option>
+          <option value="litros">Litros</option>
+          <option value="garrafas">Garrafas</option>
+          <option value="barriles">Barriles</option>
+        </optgroup>
+
+        <optgroup label="Conteo Mayorista">
+          <option value="docenas">Docenas</option>
+          <option value="gruesas">Gruesa (144 und)</option>
+          <option value="cientos">Cientos</option>
+          <option value="millares">Millares</option>
+          <option value="unidades">Unidades sueltas</option>
+        </optgroup>
+      </select>
+
+      <div class="search-error-tooltip" *ngIf="measureError">
+        {{ measureError }}
+      </div>
+    </div>
+
+    <button class="search-button" (click)="onSearch()">
+      <span *ngIf="!hasSearched">Cotizar</span>
+      <img *ngIf="hasSearched" src="assets/images/logopequ.png" alt="Buscar" class="search-button-icon">
+    </button>
+  </div>
+
+</main>

@@ -4,14 +4,11 @@
     <div class="main-logo-section">
       <img src="assets/images/logo.png" alt="Syntara Main Logo" class="main-logo">
     </div>
-
     <h2 class="search-prompt">
       ¿Qué reporte quieres generar hoy <span *ngIf="greetingName">{{ greetingName }}</span>?
     </h2>
-
-    <<div class="reports-grid">
-
-      <button class="report-btn" (click)="openVolumeModal()">
+    <div class="reports-grid">
+      <button class="report-btn" routerLink="/wholesale-search">
         <div class="btn-icon">📊</div>
         <span>Precio por Volumen</span>
       </button>
@@ -193,40 +190,8 @@
   <footer class="footer" *ngIf="!hasSearched">
     <p>Syntara • Los precios hablan, Syntara escucha. ©</p>
   </footer>
-  <div *ngIf="showVolumeModal" class="modal-overlay">
-    <div class="modal-container volume-modal">
-      <h3>Reporte de Precios por Volumen</h3>
-      <p class="modal-subtitle">Ingresa los productos y cantidades que deseas cotizar.</p>
 
-      <div class="volume-form-scroll">
-        <div *ngFor="let item of volumeItems; let i = index" class="volume-item-row">
 
-          <div class="input-group product-group">
-            <label *ngIf="i===0">Producto</label>
-            <input type="text" [(ngModel)]="item.product" placeholder="Ej: Arroz Diana">
-          </div>
-
-          <div class="input-group quantity-group">
-            <label *ngIf="i===0">Unidades</label>
-            <input type="number" [(ngModel)]="item.quantity" min="1">
-          </div>
-
-          <button *ngIf="volumeItems.length > 1" (click)="removeVolumeItem(i)" class="remove-item-btn" title="Eliminar fila">
-            ✕
-          </button>
-        </div>
-
-        <button (click)="addVolumeItem()" class="add-row-btn">
-          + Agregar otro producto
-        </button>
-      </div>
-
-      <div class="modal-actions">
-        <button (click)="closeVolumeModal()" class="cancel-btn">Cancelar</button>
-        <button (click)="generateVolumeReport()" class="confirm-btn">Generar Reporte</button>
-      </div>
-    </div>
-  </div>
   <div *ngIf="showToast" class="custom-toast" [ngClass]="toastType" [@toastAnimation]>
     <div class="toast-icon">
       <svg *ngIf="toastType === 'success'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -234,6 +199,34 @@
       <svg *ngIf="toastType === 'error'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
     </div>
     <span class="toast-text">{{ toastMessage }}</span>
+  </div>
+  <div *ngIf="showGuestBlockModal" class="modal-overlay">
+    <div class="modal-container warning-modal">
+      <div class="modal-icon">🔒</div>
+      <h3>Acceso Restringido</h3>
+      <p>
+        Para poder seguir haciendo consultas <strong>regístrate en Syntara</strong>.
+      </p>
+      <div class="modal-actions">
+        <button (click)="closeGuestModal()" class="cancel-btn">Cancelar</button>
+        <a routerLink="/register" class="confirm-btn">Registrarse</a>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showLimitModal" class="modal-overlay">
+    <div class="modal-container limit-modal">
+      <div class="modal-icon">⏳</div>
+      <h3>Límite Diario Alcanzado</h3>
+      <p>
+        Has usado tus 3 consultas gratuitas de hoy.<br>
+        <strong>Suscríbete al Plan Pro</strong> para continuar ahora, o espera hasta mañana para tener otras 3 consultas gratis.
+      </p>
+      <div class="modal-actions">
+        <button (click)="closeLimitModal()" class="cancel-btn">Entendido</button>
+        <a routerLink="/subscription" class="confirm-btn special">Ver Planes</a>
+      </div>
+    </div>
   </div>
 
 </main>

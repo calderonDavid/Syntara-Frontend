@@ -51,6 +51,7 @@ export class AppComponent {
       this.authService.logout();
       this.router.navigate(['/']);
       this.isLoading = false;
+      window.location.reload();
     }, 1500);
   }
   private getDeepestRouteSnapshot(snapshot: ActivatedRouteSnapshot): ActivatedRouteSnapshot {

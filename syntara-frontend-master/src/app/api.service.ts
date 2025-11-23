@@ -101,5 +101,19 @@ export class ApiService {
   getDistributorReport(storeName: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/reports/distributor-intelligence`, { storeName });
   }
+  // BÚSQUEDA MAYORISTA
+  searchWholesale(product: string, quantity: number | null, unit: string): Observable<any[]> {
+    let params = new HttpParams();
+    if (product) params = params.append('product', product);
+    if (quantity !== null) params = params.append('quantity', quantity.toString());
+    if (unit) params = params.append('unit', unit);
+
+    // Usamos clientDate igual que en la búsqueda normal
+    const clientDate = new Date().toISOString();
+    params = params.append('clientDate', clientDate);
+
+    // NOTA: Endpoint específico configurado en tu backend searchRoutes.js
+    return this.http.get<any[]>(`${this.baseUrl}/search/wholesale`, { params });
+  }
 }
 

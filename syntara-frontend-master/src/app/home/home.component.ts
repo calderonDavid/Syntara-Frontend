@@ -11,6 +11,7 @@ import { TypewriterDirective } from '../typewriter.directive';
 interface VolumeItem {
   product: string;
   quantity: number;
+  unit: string;
 }
 
 @Component({
@@ -60,8 +61,8 @@ export class HomeComponent implements OnInit {
   generalError: string | null = null;
   greetingName: string = '';
   resultsTitleText: string = '';
-  showVolumeModal: boolean = false;
-  volumeItems: VolumeItem[] = []; // Lista dinámica de productos
+  showGuestBlockModal: boolean = false; // Modal "Regístrate"
+  showLimitModal: boolean = false;      // Modal "Límite alcanzado"
 
   // VARIABLES PARA LA NOTIFICACIÓN (TOAST)
   showToast: boolean = false;
@@ -111,6 +112,20 @@ export class HomeComponent implements OnInit {
     if (!this.measure) { this.measureError = 'Selecciona una unidad.'; }
     if (this.productError || this.measureError) return;
 
+    if (!this.authService.isLoggedIn()) {
+      // Revisamos si ya usó su búsqueda gratis
+      const guestSearches = Number(localStorage.getItem('syntara_guest_searches') || 0);
+
+      if (guestSearches >= 1) {
+        // Ya gastó su oportunidad -> Bloqueo
+        this.showGuestBlockModal = true;
+        return;
+      }
+
+      // Si es la primera, la contamos y lo dejamos pasar
+      localStorage.setItem('syntara_guest_searches', (guestSearches + 1).toString());
+    }
+
     this.isLoading = true;
     this.hasSearched = true;
     this.lastSearchQuery = this.searchQuery;
@@ -132,11 +147,24 @@ export class HomeComponent implements OnInit {
           this.isLoading = false;
         },
         error: (err: any) => {
-          console.error('Error en búsqueda:', err);
-          this.generalError = 'Error al conectar con el backend.';
           this.isLoading = false;
+          console.error('Error en búsqueda:', err);
+
+          // --- REGLA 2: LÍMITE DE 3 BÚSQUEDAS (Status 403) ---
+          if (err.status === 403) {
+            // El backend dijo "Límite alcanzado"
+            this.showLimitModal = true;
+          } else {
+            this.generalError = 'Ocurrió un error al conectar con el servidor.';
+          }
         }
       });
+  }
+  closeGuestModal() {
+    this.showGuestBlockModal = false;
+  }
+  closeLimitModal() {
+    this.showLimitModal = false;
   }
 
   addToCart(item: any) {
@@ -200,41 +228,5 @@ export class HomeComponent implements OnInit {
       'metros': 'm', 'centimetros': 'cm', 'metros_cuadrados': 'm²'
     };
     return map[fullMeasure] || fullMeasure;
-  }
-  // --- REPORTE PRECIO POR VOLUMEN ---
-  openVolumeModal() {
-    this.volumeItems = [{ product: '', quantity: 100 }]; // Iniciamos con 1 item
-    this.showVolumeModal = true;
-  }
-  closeVolumeModal() {
-    this.showVolumeModal = false;
-  }
-  addVolumeItem() {
-    this.volumeItems.push({ product: '', quantity: 100 });
-  }
-  removeVolumeItem(index: number) {
-    if (this.volumeItems.length > 1) {
-      this.volumeItems.splice(index, 1);
-    }
-  }
-  generateVolumeReport() {
-    // Validar que no haya campos vacíos
-    const isValid = this.volumeItems.every(item => item.product.trim() !== '' && item.quantity > 0);
-
-    if (!isValid) {
-      // Reutilizamos tu notificación existente para validación
-      this.showNotification('Por favor completa todos los campos de productos y cantidades.', 'error');
-      return;
-    }
-    // Obtener el correo de la sesión actual
-    const currentUser = this.authService.getCurrentUser();
-    const userEmail = currentUser ? currentUser.email : 'tu correo';
-
-    this.closeVolumeModal();
-
-    // MOSTRAR EL MENSAJE DE ÉXITO SOLICITADO
-    this.showNotification(`Su reporte fue generado y enviado a ${userEmail} con éxito`, 'success');
-
-    // (Opcional) Aquí podrías limpiar el formulario si quisieras
   }
 }

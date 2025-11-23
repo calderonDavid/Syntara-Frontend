@@ -6,6 +6,7 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { SubscriptionComponent } from './subscription/subscription.component';
+import { WholesaleSearchComponent } from './wholesale-search/wholesale-search.component';
 import { PaymentComponent } from './payment/payment.component';
 import { authGuard } from './auth.guard';
 import { HistoryComponent } from './history/history.component';
@@ -58,6 +59,12 @@ export const routes: Routes = [
     component: DistributorReportComponent,
     canActivate: [authGuard],
     data: { animation: 'ReportPage' }
+  },
+  {
+    path: 'wholesale-search',
+    component: WholesaleSearchComponent,
+    canActivate: [authGuard], // Solo usuarios logueados
+    data: { animation: 'SearchPage' }
   },
   {
     path: 'history',
