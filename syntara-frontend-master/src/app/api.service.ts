@@ -66,4 +66,20 @@ export class ApiService {
   deleteHistoryItem(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/search/history/${id}`);
   }
+  getCart(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/cart`);
+  }
+
+  addToCart(item: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cart/add`, item);
+  }
+
+  removeFromCart(itemId: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/cart/item/${itemId}`);
+  }
+
+  clearCart(): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/cart/clear`);
+  }
 }
+

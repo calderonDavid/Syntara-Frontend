@@ -295,6 +295,11 @@
           color: #15803d;
           font-weight: 700;
         }
+        td.action-cell {
+          text-align: center;
+          vertical-align: middle;
+          padding: 15px;
+        }
       }
 
       &:hover {
@@ -309,7 +314,95 @@
     }
   }
 }
+.add-cart-btn {
+  background-color: #54a78b; // Verde corporativo
+  color: white;
+  border: none;
+  border-radius: 25px; // Bordes redondeados suaves
+  padding: 8px 16px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(84, 167, 139, 0.25); // Sombra verde suave
 
+  &:hover {
+    background-color: #4a9479; // Verde un poco más oscuro al hover
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(84, 167, 139, 0.35);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  // Estado deshabilitado visualmente (opcional, si quieres que se vea gris cuando no hay sesión)
+  &.disabled {
+    background-color: #a0aec0;
+    box-shadow: none;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: #a0aec0;
+      transform: none;
+    }
+  }
+
+  .cart-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// --- TOOLTIP PERSONALIZADO ---
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block; // Para que el tooltip se posicione respecto al botón
+}
+
+.custom-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: 160px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px 10px;
+  position: absolute;
+  z-index: 10;
+  bottom: 125%; // Posición encima del botón
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: opacity 0.3s, visibility 0.3s, bottom 0.3s;
+
+  // Triangulito (flecha) abajo del tooltip
+  &::after {
+    content: "";
+    position: absolute;
+    top: 100%; // Al final del tooltip
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+  }
+}
+
+// Mostrar tooltip al pasar el mouse sobre el wrapper, SOLO si el botón tiene la clase .disabled
+.tooltip-wrapper:hover .add-cart-btn.disabled + .custom-tooltip {
+  visibility: visible;
+  opacity: 1;
+  bottom: 135%; // Pequeño movimiento hacia arriba al aparecer
+}
 .unit-price-col {
   white-space: nowrap;
 

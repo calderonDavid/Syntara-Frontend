@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {CommonModule, DatePipe} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {AuthService} from '../auth.service';
-import {SearchResult, SearchService} from '../search.service';
-import {ApiService} from '../api.service';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router'; // <--- Importamos Router
+import { AuthService } from '../auth.service';
+import { SearchResult } from '../search.service';
+import { ApiService } from '../api.service';
 import { trigger, style, transition, animate, query, stagger } from '@angular/animations';
 import { TypewriterDirective } from '../typewriter.directive';
 
@@ -51,10 +52,11 @@ export class HomeComponent implements OnInit {
   // Variable para el texto del título animado
   resultsTitleText: string = '';
 
-  // Inyectar SearchService
+  // Inyectar Servicios y Router
   constructor(
     private authService: AuthService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private router: Router // <--- Inyectamos el Router aquí
   ) {
   }
 
@@ -121,6 +123,38 @@ export class HomeComponent implements OnInit {
         console.error('Error en la búsqueda:', err);
         this.generalError = 'Error al conectar con el backend. (¿Interceptor y token OK?)';
         this.isLoading = false;
+      }
+    });
+  }
+
+  // --- NUEVA FUNCIÓN PARA EL CARRITO ---
+  addToCart(item: any) {
+    // 1. Verificar si el usuario está logueado
+    if (!this.authService.isLoggedIn()) {
+      alert('Debes iniciar sesión para usar el carrito.');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // 2. Preparar objeto para el backend
+    // Usamos la cantidad y unidad que el usuario buscó originalmente
+    const cartItem = {
+      product: item.product,
+      price: item.price,
+      store: item.store,
+      url: item.url,
+      quantity: this.lastSearchQuantity || 1,
+      unit: this.lastSearchMeasure || 'unidad'
+    };
+
+    // 3. Llamar al servicio
+    this.apiService.addToCart(cartItem).subscribe({
+      next: () => {
+        alert(`¡${item.product} agregado al carrito!`);
+      },
+      error: (err: any) => {
+        console.error('Error al agregar al carrito:', err);
+        alert('Ocurrió un error al intentar agregar el producto.');
       }
     });
   }

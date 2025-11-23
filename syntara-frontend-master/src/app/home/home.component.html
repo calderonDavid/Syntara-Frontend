@@ -35,6 +35,7 @@
           <th>PRECIO</th>
           <th>PRECIO POR UND</th>
           <th>URL</th>
+          <th style="text-align: center;">ACCIÓN</th> <!-- Nueva columna -->
           <th>FECHA</th>
         </tr>
         </thead>
@@ -54,6 +55,17 @@
           <td>
             <a [href]="item.url" target="_blank" class="store-link">Ir a la tienda</a>
           </td>
+
+          <!-- Botón para agregar al carrito -->
+          <td style="text-align: center;">
+            <button
+              (click)="addToCart(item)"
+              title="Agregar al carrito"
+              style="background-color: #e67e22; color: white; border: none; padding: 8px 12px; border-radius: 50%; cursor: pointer; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: transform 0.2s;">
+              🛒
+            </button>
+          </td>
+
           <td>{{ item.date | date:'short' }}</td>
         </tr>
         </tbody>

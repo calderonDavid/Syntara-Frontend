@@ -6,6 +6,7 @@ import { SubscriptionComponent } from './subscription/subscription.component';
 import { PaymentComponent } from './payment/payment.component';
 import { authGuard } from './auth.guard';
 import { HistoryComponent } from './history/history.component';
+import {CartComponent} from './cart/cart.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, data: { animation: 'HomePage' } },
@@ -30,6 +31,12 @@ export const routes: Routes = [
     component: PaymentComponent,
     canActivate: [authGuard],
     data: { hideHeaderLinks: true, animation: 'PaymentPage' }
+  },
+  {
+    path: 'cart',
+    component: CartComponent,
+    canActivate: [authGuard],
+    data: { animation: 'CartPage' }
   },
   {
     path: 'history',
