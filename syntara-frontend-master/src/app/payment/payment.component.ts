@@ -26,10 +26,8 @@ export class PaymentComponent {
     console.log('Procesando pago...');
     this.isProcessing = true;
 
-    // Simulamos demora de pago y luego llamamos al backend
     setTimeout(() => {
 
-      // LLAMADA AL BACKEND PARA ASIGNAR PLAN PRO
       this.apiService.assignPlan('Pro').subscribe({
         next: (res) => {
           console.log('Plan Pro activado:', res);
@@ -37,7 +35,6 @@ export class PaymentComponent {
           this.showSuccessMessage = true;
           this.isProcessing = false;
 
-          // Redirigir después de mostrar éxito
           setTimeout(() => {
             this.router.navigate(['/']);
           }, 3000);
@@ -49,6 +46,6 @@ export class PaymentComponent {
         }
       });
 
-    }, 1500); // Simulación de espera de pasarela
+    }, 1500);
   }
 }

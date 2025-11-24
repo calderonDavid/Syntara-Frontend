@@ -62,7 +62,6 @@
             <th>PRECIO</th>
             <th>PRECIO POR UND</th>
 
-            <!-- COLUMNA DETALLES (SOLO PRO) -->
             <th *ngIf="hasProFeatures" class="th-center">DETALLES</th>
 
             <th>URL</th>
@@ -82,15 +81,12 @@
               <span class="unit-price-label">/ {{ item.measureLabel }}</span>
             </td>
 
-            <!-- CELDA CON POPOVER FLOTANTE -->
             <td *ngIf="hasProFeatures" class="details-cell">
               <div class="popover-wrapper">
-                <!-- Botón (Icono de Info) -->
                 <button class="info-icon-btn" title="Ver detalles">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                 </button>
 
-                <!-- Tarjeta Popover (Oculta por defecto) -->
                 <div class="popover-content">
                   <div class="popover-header">
                     <span class="popover-title">Análisis Syntara</span>

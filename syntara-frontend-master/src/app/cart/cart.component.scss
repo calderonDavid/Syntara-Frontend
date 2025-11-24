@@ -18,19 +18,17 @@
   }
 }
 
-/* Layout: Lista y Resumen */
 .cart-content {
   display: grid;
-  grid-template-columns: 1fr 350px; /* Resumen fijo a la derecha en PC */
+  grid-template-columns: 1fr 350px;
   gap: 30px;
   align-items: start;
 
   @media (max-width: 900px) {
-    grid-template-columns: 1fr; /* En celular, resumen baja automáticamente */
+    grid-template-columns: 1fr;
   }
 }
 
-/* Tarjeta de Item */
 .cart-item {
   background: white;
   border-radius: 20px;
@@ -97,13 +95,12 @@
   }
 }
 
-/* Resumen Total */
 .cart-summary {
   background: white;
   padding: 30px;
   border-radius: 25px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-  position: sticky; /* Se queda fijo al hacer scroll */
+  position: sticky;
   top: 20px;
 
   h3 { margin-top: 0; color: #004b3a; font-size: 22px; }
@@ -132,9 +129,7 @@
     margin-top: 10px; cursor: pointer; text-decoration: underline;
   }
 }
-// ... (mantén tus estilos de .cart-container, .cart-content, .cart-item, etc. arriba)
 
-// --- ESTILOS DEL CARRITO VACÍO (Basado en Home No-Results) ---
 .empty-cart-container {
   display: flex;
   flex-direction: column;
@@ -142,7 +137,6 @@
   justify-content: center;
   text-align: center;
 
-  // Mismo fondo y sombras que en Home
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 40px;
   padding: 50px;
@@ -152,7 +146,7 @@
 
   box-shadow: 0 15px 35px rgba(0, 75, 58, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.6);
-  animation: slideUp 0.5s ease-out; // Asegúrate de tener el keyframe slideUp o defínelo abajo
+  animation: slideUp 0.5s ease-out;
 
   .icon-wrapper {
     background-color: #eaf7f3;
@@ -167,7 +161,7 @@
     .empty-cart-icon {
       width: 50px;
       height: 50px;
-      color: #54a78b; // Verde corporativo
+      color: #54a78b;
       animation: pulse 2s infinite ease-in-out;
     }
   }
@@ -192,7 +186,6 @@
     }
   }
 
-  // Sección de sugerencias idéntica al Home
   .suggestions {
     background-color: #f8f9fa;
     padding: 20px 30px;
@@ -200,7 +193,7 @@
     text-align: left;
     width: 100%;
     max-width: 450px;
-    margin-bottom: 30px; // Espacio extra para el botón
+    margin-bottom: 30px;
 
     span {
       display: block;
@@ -226,7 +219,6 @@
     }
   }
 
-  // Botón "Ir a Buscar" (Estilo similar a tus botones principales)
   .start-shopping-btn {
     background-color: #54a78b;
     color: white;
@@ -247,7 +239,6 @@
   }
 }
 
-// Animaciones necesarias (si no están definidas globalmente)
 @keyframes pulse {
   0% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.1); opacity: 0.8; }
@@ -264,12 +255,12 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); // Fondo oscuro semi-transparente
-  z-index: 2000; // Encima de todo
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(4px); // Efecto borroso de fondo
+  backdrop-filter: blur(4px);
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -285,7 +276,6 @@
 
   .modal-icon {
     margin-bottom: 15px;
-    // Círculo suave detrás del icono de alerta
     background-color: #fff3e0;
     width: 70px; height: 70px;
     border-radius: 50%;
@@ -330,13 +320,32 @@
     }
 
     &.confirm {
-      background-color: #d32f2f; // Rojo para indicar acción destructiva
+      background-color: #d32f2f;
       color: white;
-      &:hover { background-color: #b71c1c; }
-      &:disabled { background-color: #ffcdd2; cursor: not-allowed; }
+      &:hover {
+        background-color: #b71c1c;
+      }
+      &:disabled {
+        background-color: #ffcdd2;
+        cursor: not-allowed;
+      }
     }
   }
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  } to {
+        opacity: 1;
+      }
+}
+@keyframes scaleUp {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  } to {
+        transform: scale(1);
+        opacity: 1;
+      }
+}

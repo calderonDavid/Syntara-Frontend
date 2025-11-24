@@ -1,5 +1,3 @@
-/* src/app/wholesale-search/wholesale-search.component.scss */
-
 :host { display: block; width: 100%; }
 
 .main-content {
@@ -11,7 +9,6 @@
   &.active-view { justify-content: flex-start; padding-top: 40px; }
 }
 
-/* --- ESTILOS DE LA BARRA DE BÚSQUEDA (Estándar Syntara) --- */
 .intro-section {
   text-align: center; animation: fadeIn 0.5s;
   .header-badge {
@@ -48,7 +45,6 @@
   }
 }
 
-/* --- TABLA DE RESULTADOS (ESTILO SYNTARA UNIFICADO) --- */
 .results-section {
   width: 100%; max-width: 1100px; margin-top: 20px; animation: slideUp 0.5s;
 }
@@ -58,7 +54,6 @@
   color: #004b3a; font-size: 32px; margin-bottom: 30px;
 }
 
-/* Contenedor de Tabla: Igual a Home/History */
 .results-table-container {
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 25px;
@@ -72,15 +67,14 @@
 
   th:nth-child(4),
   td:nth-child(4) {
-    width: 150px;     /* Ajusta según necesites */
-    min-width: 150px; /* evita que se haga más pequeña */
+    width: 150px;
+    min-width: 150px;
     text-align: center;
   }
 
   border-collapse: collapse;
   font-family: 'Poppins', sans-serif;
 
-  /* Encabezados Grises */
   thead {
     background-color: #e0e0e0;
     th {
@@ -93,7 +87,6 @@
     }
   }
 
-  /* Cuerpo */
   tbody {
     tr {
       border-bottom: 1px solid #eee;
@@ -110,10 +103,9 @@
     }
   }
 
-  /* Estilos específicos de columnas */
   .store-name {
     font-weight: 700;
-    color: #004b3a; /* Verde Corporativo */
+    color: #004b3a;
     text-transform: capitalize;
   }
 
@@ -154,7 +146,6 @@
   }
 }
 
-/* --- ESTILOS DE ERROR Y LOADING --- */
 .search-error-tooltip {
   position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
   background-color: #ff4d4d; color: white; padding: 10px 15px;
@@ -178,7 +169,7 @@
 }
 .search-button-icon { height: 30px; width: auto; }
 .hide-spin-buttons::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-/* ESTILOS DE BLOQUEO (Carga) */
+
 .search-button {
   position: relative;
 

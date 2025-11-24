@@ -26,36 +26,28 @@ export class SubscriptionComponent {
     private authService: AuthService
   ) {}
 
-  // Función principal al hacer clic en "Suscribirse" o "Contactar"
   selectPlan(planType: 'Pro' | 'Enterprise') {
     if (planType === 'Pro') {
-      // Lógica PRO: Redirigir a pago
       this.router.navigate(['/payment']);
     } else {
-      // Lógica ENTERPRISE: Abrir modal
       this.showEnterpriseModal = true;
     }
   }
 
-  // Función cuando presiona "¡Comunícate!"
   activateEnterprise() {
-    // Validación
     if (!this.companyName.trim()) {
       alert('Por favor ingresa el nombre de tu empresa.');
       return;
     }
-
     this.isLoading = true;
 
-    // Actualizar Nombre de Usuario (Empresa) y borrar Apellido
     this.apiService.updateUserProfile({
       name: this.companyName,
-      lastname: "" // Vacio como pediste
+      lastname: ""
     }).subscribe({
       next: () => {
         console.log('Perfil actualizado a Empresa');
 
-        // Asignar Plan
         this.assignEnterprisePlan();
       },
       error: (err) => {
@@ -71,7 +63,6 @@ export class SubscriptionComponent {
       next: (res) => {
         console.log('Plan Enterprise activado:', res);
 
-        //ACTUALIZAR ESTADO LOCAL (Para que el header cambie y el Home cambie)
         this.authService.updateUserLocal({
           isSubscribed: true,
           name: this.companyName,
@@ -97,6 +88,6 @@ export class SubscriptionComponent {
   closeModal() {
     this.showEnterpriseModal = false;
     this.successMessage = null;
-    this.companyName = ''; // Limpiar campo
+    this.companyName = '';
   }
 }

@@ -39,7 +39,6 @@ import { TypewriterDirective } from '../typewriter.directive';
 })
 export class HomeComponent implements OnInit {
 
-  // ... Variables de búsqueda existentes ...
   searchQuery: string = '';
   quantity: number | null = 1;
   measure: string = '';
@@ -49,29 +48,24 @@ export class HomeComponent implements OnInit {
   hasSearched: boolean = false;
   isLoading: boolean = false;
 
-  // Resultados
   results: (SearchResult & { measureLabel: string })[] = [];
 
-  // Errores
   productError: string | null = null;
   measureError: string | null = null;
   generalError: string | null = null;
   quantityError: string | null = null;
 
-  // UI Info
   greetingName: string = '';
   resultsTitleText: string = '';
   showGuestBlockModal: boolean = false;
   showLimitModal: boolean = false;
 
-  // Toast
   showToast: boolean = false;
   toastMessage: string = '';
   toastType: 'success' | 'error' = 'success';
 
-  // --- PERMISOS DE USUARIO ---
-  isEnterpriseUser: boolean = false; // Para vista Enterprise completa
-  hasProFeatures: boolean = false;   // Para ver detalles (Pro + Enterprise)
+  isEnterpriseUser: boolean = false;
+  hasProFeatures: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -92,11 +86,7 @@ export class HomeComponent implements OnInit {
         next: (plan) => {
           console.log('Plan actual:', plan);
 
-          // Verificar Enterprise (Vista especial)
           this.isEnterpriseUser = (plan && plan.type === 'Enterprise');
-
-          // Verificar ProFeatures (Para ver columna detalles)
-          // Tanto Pro como Enterprise pueden ver detalles
           if (plan && (plan.type === 'Pro' || plan.type === 'Enterprise')) {
             this.hasProFeatures = true;
           } else {
@@ -236,7 +226,6 @@ export class HomeComponent implements OnInit {
     return map[fullMeasure] || fullMeasure;
   }
 
-  // Helper para mostrar info segura en el popover
   getDetailsContent(item: SearchResult): string {
     if (item.productDetails) return item.productDetails;
     if (item.raw && item.raw.notes) return item.raw.notes;

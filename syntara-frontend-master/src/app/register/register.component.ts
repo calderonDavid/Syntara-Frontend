@@ -49,20 +49,18 @@ export class RegisterComponent {
     this.registerError = null;
 
     if (this.registerForm.valid) {
-      // obtenemos los valores del formulario
-      const formValue = this.registerForm.value;
 
-      // Toca tarducir el payload a INGLÉS (como lo espera el backend User.js), porque no sabiamos que había incompatibilidad con nombres
+      const formValue = this.registerForm.value;
       const payload = {
-        name: formValue.nombre,         // 'nombre' -> 'name'
-        lastname: formValue.apellido,   // 'apellido' -> 'lastname'
-        email: formValue.correo,        // 'correo' -> 'email'
-        password: formValue.contrasena  // 'contrasena' -> 'password'
+        name: formValue.nombre,
+        lastname: formValue.apellido,
+        email: formValue.correo,
+        password: formValue.contrasena
       };
-      // El backend (User.js) maneja 'role' y 'createdAt' automáticamente.
+
       console.log('Enviando datos TRADUCIDOS al backend:', payload);
 
-      // Se envia el 'payload' completo al ApiService
+
       this.apiService.register(payload).subscribe({
         next: (response) => {
           console.log('Registro exitoso!', response)

@@ -25,12 +25,9 @@ export class AppComponent {
     private authService: AuthService,
     private contexts: ChildrenOutletContexts
   ) {
-    // Nos suscribimos a los cambios del usuario
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
-
-    // Lógica existente para ocultar botones en Login/Register
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
@@ -39,20 +36,16 @@ export class AppComponent {
       this.showHeaderLinks = !hide;
     });
   }
- // // Obtener el nombre de la animación de la ruta actual
   getRouteAnimationData() {
     return this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'];
   }
   goHome() {
-    // Si ya estamos en el home, recargamos para limpiar la búsqueda
     if (this.router.url === '/') {
       window.location.reload();
     } else {
-      // Si estamos en otra página, navegamos al home
       this.router.navigate(['/']);
     }
   }
-  // SALIR DE LA SESIÓN
   logout() {
     this.isLoading = true;
     setTimeout(() => {

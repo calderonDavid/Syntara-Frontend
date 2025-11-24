@@ -61,7 +61,7 @@ export class DistributorReportComponent implements OnInit {
     } else {
       this.targetStore = 'Mi Empresa';
     }
-    this.setupDateLimits(); // Inicializar fechas
+    this.setupDateLimits();
   }
 
   setupDateLimits() {
@@ -100,7 +100,6 @@ export class DistributorReportComponent implements OnInit {
             this.errorMessage = `No hay suficientes datos de búsqueda recientes para "${this.targetStore}".`;
           }
         } else {
-          // Normalización
           const productMap = new Map<string, string>();
 
           this.trendsData.forEach(item => {
@@ -158,7 +157,6 @@ export class DistributorReportComponent implements OnInit {
       return;
     }
 
-    // Validaciones extra
     if (this.reportConfig.dateStart > this.reportConfig.dateEnd) {
       this.showNotification('Fecha de inicio mayor a fecha final.', 'warning');
       return;

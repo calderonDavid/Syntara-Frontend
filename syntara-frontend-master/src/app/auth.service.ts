@@ -8,7 +8,7 @@ export interface User {
   lastname: string;
   email: string;
   role: string;
-  isSubscribed?: boolean; // Este campo lo manejaremos localmente
+  isSubscribed?: boolean;
 }
 
 @Injectable({
@@ -16,50 +16,42 @@ export interface User {
 })
 export class AuthService {
 
-  // Claves para guardar en localStorage
   private tokenKey = 'authToken';
   private userKey = 'user';
 
-  //BehaviorSubject para el estado del usuario
   private _currentUser = new BehaviorSubject<User | null>(null);
   currentUser$ = this._currentUser.asObservable();
 
   constructor(private router: Router) {
-    // Al cargar, intentar recuperar la sesión
     const savedUser = localStorage.getItem(this.userKey);
     if (savedUser) {
       try {
         this._currentUser.next(JSON.parse(savedUser));
       } catch (e) {
         console.error('Error al recuperar sesión, limpiando...', e);
-        this.logout(); // Limpia si los datos están corruptos
+        this.logout();
       }
     }
   }
 
-  // Metodo auxiliar para obtener el usuario actual
   getCurrentUser(): User | null {
     return this._currentUser.getValue();
   }
 
-  // Metodo para que el Interceptor lea el token
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
 
-  // Metodo para saber si está autenticado
   isLoggedIn(): boolean {
     return !!this.getToken() && !!this.getCurrentUser();
   }
 
-  // "Login" (guardar estado) - Este es llamado por ApiService
   login(user: User, token: string): void {
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.userKey, JSON.stringify(user));
     this._currentUser.next(user);
   }
 
-  // "Logout" (limpiar estado)
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
@@ -74,7 +66,6 @@ export class AuthService {
     }
   }
 
-  // Helper privado para guardar y notificar
   private updateLocalStorageUser(user: User) {
     localStorage.setItem(this.userKey, JSON.stringify(user));
     this._currentUser.next(user);

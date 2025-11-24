@@ -37,7 +37,6 @@ export class WholesaleSearchComponent {
   resultsTitleText: string = '';
   generalError: string | null = null;
 
-  // Variables de error para los tooltips
   productError: string | null = null;
   measureError: string | null = null;
   quantityError: string | null = null;
@@ -45,20 +44,17 @@ export class WholesaleSearchComponent {
   constructor(private apiService: ApiService) {}
 
   preventInvalidCharacters(event: KeyboardEvent): void {
-    // Bloqueamos el signo menos (-), mas (+), y la 'e' (exponente)
     if (['-', '+', 'e', 'E'].includes(event.key)) {
       event.preventDefault();
     }
   }
 
   onSearch() {
-    // 1. Resetear errores
     this.productError = null;
     this.measureError = null;
     this.quantityError = null;
     this.generalError = null;
     this.results = [];
-
 
     if (!this.searchQuery.trim()) {
       this.productError = 'Escribe un producto.';
@@ -70,10 +66,8 @@ export class WholesaleSearchComponent {
       this.measureError = 'Selecciona unidad.';
     }
 
-    // Si hay errores, detenemos aquí y el HTML mostrará los tooltips rojos
     if (this.productError || this.measureError) return;
 
-    // 3. Ejecutar búsqueda
     this.isLoading = true;
     this.hasSearched = true;
     this.resultsTitleText = `Cotización Mayorista: ${this.searchQuery}`;

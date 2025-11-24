@@ -24,12 +24,10 @@ export class HistoryComponent implements OnInit {
   searchHistory: HistoryItem[] = [];
   isLoadingHistory: boolean = false;
   historyError: string | null = null;
-
-  // Variables para el Modal de confirmación
   showConfirmModal: boolean = false;
-  isClearing: boolean = false; // Spinner dentro del modal
-  itemToDelete: HistoryItem | null = null; // Para saber qué estamos borrando (null = borrar todo)
-  modalMessage: string = ''; // Mensaje dinámico del modal
+  isClearing: boolean = false;
+  itemToDelete: HistoryItem | null = null;
+  modalMessage: string = '';
 
   constructor(
     private apiService: ApiService,
@@ -47,7 +45,6 @@ export class HistoryComponent implements OnInit {
     this.apiService.getSearchHistory().subscribe({
       next: (response: any) => {
         this.searchHistory = (response.data || response) as HistoryItem[];
-        // Ordenar por fecha descendente
         this.searchHistory.sort((a, b) =>
           new Date(b.date).getTime() - new Date(a.date).getTime()
         );
@@ -71,36 +68,30 @@ export class HistoryComponent implements OnInit {
     });
   }
 
-  //Abrir modal para borrar TODO
   requestClearAll() {
-    this.itemToDelete = null; // null indica borrar todo
+    this.itemToDelete = null;
     this.modalMessage = '¿Estás seguro de que quieres borrar TODO tu historial?';
     this.showConfirmModal = true;
   }
 
-  //Abrir modal para borrar UN ITEM
   requestDeleteItem(item: HistoryItem) {
     this.itemToDelete = item;
     this.modalMessage = '¿Eliminar este registro del historial?';
     this.showConfirmModal = true;
   }
 
-  //Cancelar
   cancelClear() {
     this.showConfirmModal = false;
     this.itemToDelete = null;
   }
 
-  // Confirmar acción
   confirmClear() {
     this.isClearing = true;
 
     setTimeout(() => {
       if (this.itemToDelete) {
-        // Borrar solo uno
         this.deleteSingleItem(this.itemToDelete);
       } else {
-        // Borrar todo
         this.deleteAllHistory();
       }
     }, 800);
@@ -123,13 +114,11 @@ export class HistoryComponent implements OnInit {
   private deleteSingleItem(item: HistoryItem) {
     this.apiService.deleteHistoryItem(item.id).subscribe({
       next: () => {
-        // Filtrar localmente para no recargar toda la lista
         this.searchHistory = this.searchHistory.filter(h => h.id !== item.id);
         this.finalizeAction();
       },
       error: (err) => {
         console.error('Error al borrar item:', err);
-        // Opcional: mostrar error en UI
         this.finalizeAction();
       }
     });

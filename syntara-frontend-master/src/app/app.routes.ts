@@ -63,7 +63,7 @@ export const routes: Routes = [
   {
     path: 'wholesale-search',
     component: WholesaleSearchComponent,
-    canActivate: [authGuard], // Solo usuarios logueados
+    canActivate: [authGuard],
     data: { animation: 'SearchPage' }
   },
   {

@@ -1,6 +1,6 @@
 <header class="header">
   <div class="header-left">
-    <!-- Botón Historial Existente -->
+
     <a *ngIf="currentUser && showHeaderLinks"
        routerLink="/history"
        class="nav-link history-icon-button"
@@ -9,13 +9,11 @@
       <span class="tooltip">Ver historial</span>
     </a>
 
-    <!-- NUEVO: Botón Carrito -->
     <a *ngIf="currentUser && showHeaderLinks"
        routerLink="/cart"
        class="nav-link history-icon-button"
        style="margin-left: 10px;"
        aria-label="Ver carrito">
-      <!-- Icono de carrito SVG simple -->
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#004b3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="9" cy="21" r="1"></circle>
         <circle cx="20" cy="21" r="1"></circle>
