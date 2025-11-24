@@ -48,7 +48,8 @@ Sigue estos pasos para ejecutar la aplicación en un entorno local:
     ```bash
     \syntara-frontend-master\syntara-frontend-master\src\app\api.service.ts
     ```
-    Modifica la ip-back por la ip de la maquina que tenga contenido el Backend y el port un puerto libre tanto de la maquina con el Frontend y la del Backend
+    Modifica la ip-back por la ip de la maquina que tenga contenido el Backend y el port un puerto libre tanto de la maquina con el Frontend y la del Backend.
+   
 
     
 Backend: https://github.com/sophieMjs/syntara-backend/tree/master
