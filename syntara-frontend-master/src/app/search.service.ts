@@ -21,6 +21,8 @@ export interface SearchResult {
   date: string;
   confidence: number;
   isOffer?: boolean;
+  productDetails?: string;
+  raw?: any;
 }
 
 @Injectable({

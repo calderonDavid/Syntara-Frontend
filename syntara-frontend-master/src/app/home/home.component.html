@@ -61,39 +61,73 @@
             <th>TIENDA</th>
             <th>PRECIO</th>
             <th>PRECIO POR UND</th>
+
+            <!-- COLUMNA DETALLES (SOLO PRO) -->
+            <th *ngIf="hasProFeatures" class="th-center">DETALLES</th>
+
             <th>URL</th>
-            <th style="text-align: center;">ACCIÓN</th> <th>FECHA</th>
+            <th class="th-center">ACCIÓN</th>
+            <th>FECHA</th>
           </tr>
           </thead>
 
           <tbody [@listAnimation]="results.length">
           <tr *ngFor="let item of results; let first = first" [class.highlight-row]="first">
             <td class="store-name">{{ item.store }}</td>
-            <td
-              class="price-col"
-              [class.offer-price]="item.isOffer">
+            <td class="price-col" [class.offer-price]="item.isOffer">
               $ {{ item.price | number:'1.0-0' }}
             </td>
             <td class="unit-price-col">
               <span class="unit-price-value">$ {{ item.unitPrice | number:'1.0-0' }}</span>
               <span class="unit-price-label">/ {{ item.measureLabel }}</span>
             </td>
+
+            <!-- CELDA CON POPOVER FLOTANTE -->
+            <td *ngIf="hasProFeatures" class="details-cell">
+              <div class="popover-wrapper">
+                <!-- Botón (Icono de Info) -->
+                <button class="info-icon-btn" title="Ver detalles">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+
+                <!-- Tarjeta Popover (Oculta por defecto) -->
+                <div class="popover-content">
+                  <div class="popover-header">
+                    <span class="popover-title">Análisis Syntara</span>
+                  </div>
+                  <div class="popover-body">
+                    <p class="detail-text">{{ getDetailsContent(item) }}</p>
+
+                    <div class="tags-row">
+                      <span class="tag tag-verified" *ngIf="item.raw?.locationValidated">
+                        Bogotá
+                      </span>
+                      <span class="tag tag-offer" *ngIf="item.isOffer">
+                        Oferta
+                      </span>
+                    </div>
+
+                    <div class="meta-row" *ngIf="item.confidence">
+                      <span>Confianza:</span>
+                      <strong>{{ item.confidence * 100 | number:'1.0-0' }}%</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+
             <td>
               <a [href]="item.url" target="_blank" class="store-link">Ir a la tienda</a>
             </td>
 
             <td class="action-cell">
               <button (click)="addToCart(item)" class="cart-action-btn" title="Agregar al carrito">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                 <span class="plus-sign">+</span>
               </button>
             </td>
 
-            <td>{{ item.date | date:'short' }}</td>
+            <td>{{ item.date | date:'shortDate' }}</td>
           </tr>
           </tbody>
         </table>
@@ -135,63 +169,63 @@
           {{ productError }}
         </div>
       </div>
-      <div class="search-input-wrapper quantity-input">
-        <input type="number"
-               placeholder="Cant."
-               class="search-input hide-spin-buttons"
-               min="1"
-               [(ngModel)]="quantity"
-               (keydown)="preventInvalidCharacters($event)"
-               (keyup.enter)="onSearch()">
+  <div class="search-input-wrapper quantity-input">
+    <input type="number"
+           placeholder="Cant."
+           class="search-input hide-spin-buttons"
+           min="1"
+           [(ngModel)]="quantity"
+           (keydown)="preventInvalidCharacters($event)"
+           (keyup.enter)="onSearch()">
 
-        <div class="search-error-tooltip" *ngIf="quantityError">
-          {{ quantityError }}
-        </div>
-      </div>
-      <div class="search-input-wrapper measure-select">
-        <select class="search-input" [(ngModel)]="measure">
-          <option value="" disabled selected>Unidad de medida</option>
-          <optgroup label="Conteo">
-            <option value="unidades">Unidades</option>
-            <option value="pares">Pares</option>
-            <option value="docenas">Docenas</option>
-            <option value="cajas">Cajas</option>
-            <option value="paquetes">Paquetes</option>
-            <option value="bolsas">Bolsas</option>
-            <option value="kits">Kits / Sets</option>
-          </optgroup>
-          <optgroup label="Peso (Masa)">
-            <option value="kilogramos">Kilogramos (kg)</option>
-            <option value="gramos">Gramos (g)</option>
-            <option value="libras">Libras (lb)</option>
-          </optgroup>
-          <optgroup label="Peso Tradicional">
-            <option value="arrobas">Arroba</option>
-            <option value="quintales">Quintales</option>
-            <option value="bultos">Bultos</option>
-          </optgroup>
-          <optgroup label="Volumen">
-            <option value="litros">Litros (L)</option>
-            <option value="mililitros">Mililitros (ml)</option>
-            <option value="galones">Galones</option>
-          </optgroup>
-          <optgroup label="Longitud/Área">
-            <option value="metros">Metros (m)</option>
-            <option value="centimetros">Centímetros (cm)</option>
-            <option value="metros_cuadrados">Metros Cuadrados (m²)</option>
-          </optgroup>
-        </select>
-        <div class="search-error-tooltip" *ngIf="measureError">
-          {{ measureError }}
-        </div>
-      </div>
-      <button class="search-button" (click)="onSearch()" [disabled]="isLoading">
-        <span class="loading-tooltip" *ngIf="isLoading">Espera que termine la búsqueda</span>
-
-        <span *ngIf="!hasSearched">Buscar</span>
-        <img *ngIf="hasSearched" src="assets/images/logopequ.png" alt="Buscar" class="search-button-icon">
-      </button>
+    <div class="search-error-tooltip" *ngIf="quantityError">
+      {{ quantityError }}
     </div>
+  </div>
+  <div class="search-input-wrapper measure-select">
+    <select class="search-input" [(ngModel)]="measure">
+      <option value="" disabled selected>Unidad de medida</option>
+      <optgroup label="Conteo">
+        <option value="unidades">Unidades</option>
+        <option value="pares">Pares</option>
+        <option value="docenas">Docenas</option>
+        <option value="cajas">Cajas</option>
+        <option value="paquetes">Paquetes</option>
+        <option value="bolsas">Bolsas</option>
+        <option value="kits">Kits / Sets</option>
+      </optgroup>
+      <optgroup label="Peso (Masa)">
+        <option value="kilogramos">Kilogramos (kg)</option>
+        <option value="gramos">Gramos (g)</option>
+        <option value="libras">Libras (lb)</option>
+      </optgroup>
+      <optgroup label="Peso Tradicional">
+        <option value="arrobas">Arroba</option>
+        <option value="quintales">Quintales</option>
+        <option value="bultos">Bultos</option>
+      </optgroup>
+      <optgroup label="Volumen">
+        <option value="litros">Litros (L)</option>
+        <option value="mililitros">Mililitros (ml)</option>
+        <option value="galones">Galones</option>
+      </optgroup>
+      <optgroup label="Longitud/Área">
+        <option value="metros">Metros (m)</option>
+        <option value="centimetros">Centímetros (cm)</option>
+        <option value="metros_cuadrados">Metros Cuadrados (m²)</option>
+      </optgroup>
+    </select>
+    <div class="search-error-tooltip" *ngIf="measureError">
+      {{ measureError }}
+    </div>
+  </div>
+  <button class="search-button" (click)="onSearch()" [disabled]="isLoading">
+    <span class="loading-tooltip" *ngIf="isLoading">Espera que termine la búsqueda</span>
+
+    <span *ngIf="!hasSearched">Buscar</span>
+    <img *ngIf="hasSearched" src="assets/images/logopequ.png" alt="Buscar" class="search-button-icon">
+  </button>
+</div>
   </ng-container>
 
   <footer class="footer" *ngIf="!hasSearched">

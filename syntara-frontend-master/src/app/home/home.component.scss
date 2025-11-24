@@ -1,3 +1,9 @@
+/* src/app/home/home.component.scss */
+
+/* -------------------------------------------------------------------------- */
+/* LAYOUT PRINCIPAL                              */
+/* -------------------------------------------------------------------------- */
+
 .main-content {
   flex-grow: 1;
   display: flex;
@@ -51,6 +57,10 @@
   margin-bottom: 55px;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
+
+/* -------------------------------------------------------------------------- */
+/* BARRA DE BÚSQUEDA                             */
+/* -------------------------------------------------------------------------- */
 
 .search-section {
   display: flex;
@@ -162,11 +172,29 @@
   transition: all 0.3s ease;
   height: 78px;
   box-sizing: border-box;
+  position: relative; /* Para el tooltip de loading */
 
   &:hover {
     background-color: #4a9479;
     transform: translateY(-1px);
   }
+
+  &:disabled {
+    background-color: #b0bec5 !important;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
+
+    .search-button-icon {
+      filter: grayscale(100%) opacity(0.7);
+    }
+  }
+}
+
+.search-button-icon {
+  height: 38px;
+  width: auto;
+  display: block;
 }
 
 .search-error-tooltip {
@@ -198,17 +226,46 @@
   }
 }
 
-@keyframes shake {
-  0%, 100% {
-    transform: translateX(-50%);
-  }
-  20%, 60% {
-    transform: translateX(calc(-50% - 5px));
-  }
-  40%, 80% {
-    transform: translateX(calc(-50% + 5px));
+/* Tooltip de "Espera que termine la búsqueda" */
+.loading-tooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
   }
 }
+
+.search-button:disabled:hover .loading-tooltip {
+  opacity: 1;
+  visibility: visible;
+  bottom: 130%;
+}
+
+/* -------------------------------------------------------------------------- */
+/* SECCIÓN DE RESULTADOS                          */
+/* -------------------------------------------------------------------------- */
 
 .results-section {
   width: 100%;
@@ -243,22 +300,29 @@
   margin-top: 50px;
 }
 
+/* IMPORTANTE: overflow visible para que el popover no se corte.
+   El border-radius se maneja en los TH.
+*/
 .results-table-container {
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 25px;
-  overflow: hidden;
+  overflow: visible; /* CLAVE PARA EL POPOVER */
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
 }
 
 .results-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-family: 'Poppins', sans-serif;
 
   thead {
-    background-color: #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 5;
 
     th {
+      background-color: #e0e0e0;
       padding: 25px 30px;
       text-align: left;
       font-weight: 700;
@@ -266,6 +330,11 @@
       text-transform: uppercase;
       font-size: 18px;
       letter-spacing: 0.5px;
+      border-bottom: 1px solid #ccc;
+
+      /* Redondeo manual de esquinas superiores */
+      &:first-child { border-top-left-radius: 25px; }
+      &:last-child { border-top-right-radius: 25px; }
     }
   }
 
@@ -274,31 +343,26 @@
       border-bottom: 1px solid #eee;
       transition: background-color 0.2s;
 
-      &:last-child {
+      &:last-child td {
         border-bottom: none;
+        /* Redondeo manual de esquinas inferiores si se desea */
+        &:first-child { border-bottom-left-radius: 25px; }
+        &:last-child { border-bottom-right-radius: 25px; }
       }
 
       &.highlight-row {
         background-color: #dcfce7;
-
         td {
           color: #166534;
           font-weight: 600;
-
           .price-col.offer-price {
-            color: #D32F2F; // Color rojo para ofertas
-            font-weight: 700; // Más grueso para destacar
+            color: #D32F2F;
+            font-weight: 700;
           }
         }
-
         .store-link {
           color: #15803d;
           font-weight: 700;
-        }
-        td.action-cell {
-          text-align: center;
-          vertical-align: middle;
-          padding: 15px;
         }
       }
 
@@ -311,36 +375,205 @@
       padding: 28px 30px;
       font-size: 20px;
       color: #333;
+      border-bottom: 1px solid #eee;
     }
   }
 }
-// En src/app/home/home.component.scss
 
-// Asegúrate de que la celda tenga alineación centrada
-.results-table tbody td.action-cell {
+.results-table tbody td.action-cell,
+.results-table thead th.th-center {
   text-align: center;
   vertical-align: middle;
-  padding: 10px; // Ajuste de padding para que no se vea apretado
 }
 
-// --- NUEVO ESTILO DEL BOTÓN ---
+/* -------------------------------------------------------------------------- */
+/* ESTILOS DE CELDAS ESPECÍFICAS                       */
+/* -------------------------------------------------------------------------- */
+
+.unit-price-col {
+  white-space: nowrap;
+  .unit-price-value { font-size: 18px; font-weight: 600; }
+  .unit-price-label { font-size: 22px; font-weight: 700; color: #004b3a; }
+}
+
+.store-link {
+  color: #0ea5e9;
+  text-decoration: none;
+  font-weight: 500;
+  &:hover { text-decoration: underline; }
+}
+
+/* -------------------------------------------------------------------------- */
+/* POPOVER DE DETALLES                            */
+/* -------------------------------------------------------------------------- */
+
+.details-cell {
+  text-align: center;
+  vertical-align: middle;
+  position: relative; /* Contexto para el popover */
+}
+
+.popover-wrapper {
+  display: inline-block;
+  position: relative;
+
+  /* Botón Info Sutil */
+  .info-icon-btn {
+    background: transparent;
+    border: none;
+    color: #54a78b;
+    cursor: help;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+      color: #004b3a;
+    }
+  }
+
+  /* La Ventana Flotante */
+  .popover-content {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+
+    /* Posicionamiento clave: Arriba y Centrado */
+    bottom: 140%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px); /* Efecto de entrada */
+
+    width: 280px;
+    background-color: #ffffff;
+    border-radius: 16px;
+
+    /* Sombra fuerte para que destaque del fondo */
+    box-shadow: 0 15px 40px -5px rgba(0, 0, 0, 0.25), 0 8px 16px -8px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+
+    z-index: 1000;
+    text-align: left;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+
+    /* Flecha inferior */
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -8px;
+      border-width: 8px;
+      border-style: solid;
+      border-color: #ffffff transparent transparent transparent;
+    }
+
+    /* Header del Popover */
+    .popover-header {
+      padding: 12px 16px;
+      background-color: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      border-radius: 16px 16px 0 0;
+
+      .popover-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #334155;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    /* Cuerpo del Popover */
+    .popover-body {
+      padding: 16px;
+
+      .detail-text {
+        font-size: 13px;
+        color: #475569;
+        line-height: 1.5;
+        margin-bottom: 12px;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      .tags-row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+
+        .tag {
+          font-size: 11px;
+          padding: 3px 8px;
+          border-radius: 6px;
+          font-weight: 600;
+
+          &.tag-verified { background: #dcfce7; color: #15803d; }
+          &.tag-offer { background: #fee2e2; color: #b91c1c; }
+        }
+      }
+
+      .meta-row {
+        border-top: 1px solid #f1f5f9;
+        padding-top: 10px;
+        font-size: 12px;
+        color: #64748b;
+        display: flex;
+        justify-content: space-between;
+
+        strong { color: #0f172a; }
+      }
+    }
+  }
+
+  /* Mostrar al hacer Hover */
+  &:hover .popover-content {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+}
+
+/* Ajuste móvil para el popover */
+@media (max-width: 768px) {
+  .popover-wrapper .popover-content {
+    width: 240px;
+    left: auto;
+    right: -20px;
+    transform: translateY(10px);
+
+    &::after {
+      left: auto;
+      right: 25px;
+    }
+  }
+  .popover-wrapper:hover .popover-content {
+    transform: translateY(0);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* BOTÓN CARRITO Y OTROS                              */
+/* -------------------------------------------------------------------------- */
+
 .cart-action-btn {
   position: relative;
   width: 42px;
   height: 42px;
   border-radius: 50%;
   border: none;
-
-  // Gradiente sutil basado en tu verde corporativo
   background: linear-gradient(135deg, #54a78b, #428a70);
   color: white;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); // Efecto rebote suave
-  box-shadow: 0 4px 12px rgba(84, 167, 139, 0.4); // Sombra verde difuminada
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 12px rgba(84, 167, 139, 0.4);
 
   svg {
     width: 20px;
@@ -355,25 +588,17 @@
     right: 8px;
     font-size: 10px;
     font-weight: 800;
-    opacity: 0; // Oculto por defecto, aparece al hover
+    opacity: 0;
     transform: translateY(5px);
     transition: all 0.3s ease;
   }
 
-  // Estados Hover y Active
   &:hover {
-    background: #004b3a; // Verde oscuro (Syntara Títulos) al pasar el mouse
+    background: #004b3a;
     transform: translateY(-3px) scale(1.05);
     box-shadow: 0 6px 15px rgba(0, 75, 58, 0.3);
-
-    svg {
-      transform: translateX(-2px); // Mueve un poco el carrito a la izquierda
-    }
-
-    .plus-sign {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    svg { transform: translateX(-2px); }
+    .plus-sign { opacity: 1; transform: translateY(0); }
   }
 
   &:active {
@@ -381,77 +606,9 @@
     box-shadow: 0 2px 5px rgba(0, 75, 58, 0.3);
   }
 }
-// --- TOOLTIP PERSONALIZADO ---
-.tooltip-wrapper {
-  position: relative;
-  display: inline-block; // Para que el tooltip se posicione respecto al botón
-}
 
-.custom-tooltip {
-  visibility: hidden;
-  opacity: 0;
-  width: 160px;
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  border-radius: 8px;
-  padding: 8px 10px;
-  position: absolute;
-  z-index: 10;
-  bottom: 125%; // Posición encima del botón
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  font-weight: 500;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  transition: opacity 0.3s, visibility 0.3s, bottom 0.3s;
-
-  // Triangulito (flecha) abajo del tooltip
-  &::after {
-    content: "";
-    position: absolute;
-    top: 100%; // Al final del tooltip
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #333 transparent transparent transparent;
-  }
-}
-
-// Mostrar tooltip al pasar el mouse sobre el wrapper, SOLO si el botón tiene la clase .disabled
-.tooltip-wrapper:hover .add-cart-btn.disabled + .custom-tooltip {
-  visibility: visible;
-  opacity: 1;
-  bottom: 135%; // Pequeño movimiento hacia arriba al aparecer
-}
-.unit-price-col {
-  white-space: nowrap;
-
-  .unit-price-value {
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  .unit-price-label {
-    font-size: 22px;
-    font-weight: 700;
-    color: #004b3a;
-  }
-}
-
-.store-link {
-  color: #0ea5e9;
-  text-decoration: none;
-  font-weight: 500;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
+/* --- FOOTER Y OTROS --- */
 .footer {
-
   position: fixed;
   bottom: 30px;
   left: 0;
@@ -468,23 +625,15 @@
   display: none;
 }
 
+/* Selectores especiales para inputs numéricos y selects */
 .hide-spin-buttons {
   &::-webkit-outer-spin-button,
-  &::-webkit-inner-spin-button {
-    -webkit-appearance: none !important;
-    margin: 0;
-  }
-
-  &[type=number] {
-    -moz-appearance: textfield !important;
-  }
+  &::-webkit-inner-spin-button { -webkit-appearance: none !important; margin: 0; }
+  &[type=number] { -moz-appearance: textfield !important; }
 }
 
 .measure-select select {
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  cursor: pointer;
   padding-right: 20px;
   color: #333;
   font-size: 20px;
@@ -494,60 +643,25 @@
   outline: none;
 }
 
-.measure-select optgroup,
-.measure-select option {
-  font-size: 18px;
-  font-weight: normal;
-}
-
 .measure-select optgroup {
   font-weight: bold;
   color: #004b3a;
   padding-top: 5px;
 }
 
-.search-button-icon {
-  height: 38px;
-  width: auto;
-  display: block;
-}
-
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
+/* Animaciones y No Results */
 .no-results-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 40px;
   padding: 50px;
   margin: 30px auto;
   max-width: 700px;
   width: 90%;
-
   box-shadow: 0 15px 35px rgba(0, 75, 58, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.6);
   animation: slideUp 0.5s ease-out;
@@ -561,246 +675,81 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 25px;
-
     .no-results-icon {
-      width: 50px;
-      height: 50px;
-      color: #54a78b;
+      width: 50px; height: 50px; color: #54a78b;
       animation: pulse 2s infinite ease-in-out;
     }
   }
 
-  h3 {
-    font-family: 'Rubik', sans-serif;
-    font-size: 28px;
-    color: #042940;
-    margin: 0 0 15px 0;
-  }
-
-  p {
-    font-family: 'Poppins', sans-serif;
-    font-size: 18px;
-    color: #555;
-    margin-bottom: 25px;
-    line-height: 1.5;
-
-    strong {
-      color: #004b3a;
-      font-weight: 600;
-    }
-  }
+  h3 { font-family: 'Rubik', sans-serif; font-size: 28px; color: #042940; margin: 0 0 15px 0; }
+  p { font-family: 'Poppins', sans-serif; font-size: 18px; color: #555; margin-bottom: 25px; line-height: 1.5; strong { color: #004b3a; font-weight: 600; } }
 
   .suggestions {
-    background-color: #f8f9fa;
-    padding: 20px 30px;
-    border-radius: 20px;
-    text-align: left;
-    width: 100%;
-    max-width: 450px;
-
-    span {
-      display: block;
-      font-weight: 600;
-      color: #54a78b;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-
-    ul {
-      margin: 0;
-      padding-left: 20px;
-
-      li {
-        color: #666;
-        margin-bottom: 8px;
-        font-size: 15px;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-    }
+    background-color: #f8f9fa; padding: 20px 30px; border-radius: 20px; text-align: left; width: 100%; max-width: 450px;
+    span { display: block; font-weight: 600; color: #54a78b; margin-bottom: 10px; font-size: 16px; }
+    ul { margin: 0; padding-left: 20px; li { color: #666; margin-bottom: 8px; font-size: 15px; &:last-child { margin-bottom: 0; } } }
   }
 }
 
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-// --- ESTILOS DE LA NOTIFICACIÓN (TOAST) ---
+@keyframes shake {
+  0%, 100% { transform: translateX(-50%); }
+  20%, 60% { transform: translateX(calc(-50% - 5px)); }
+  40%, 80% { transform: translateX(calc(-50% + 5px)); }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- ESTILOS DE LA NOTIFICACIÓN (TOAST) --- */
 .custom-toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
-  border-radius: 50px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(10px);
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  min-width: 300px;
-  justify-content: center;
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999;
+  display: flex; align-items: center; gap: 12px; padding: 12px 24px;
+  border-radius: 50px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); backdrop-filter: blur(10px);
+  font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 16px; min-width: 300px; justify-content: center;
 
-  &.success {
-    background-color: rgba(255, 255, 255, 0.95);
-    border: 2px solid #54a78b;
-    color: #004b3a;
-    .toast-icon svg { stroke: #54a78b; }
-  }
+  &.success { background-color: rgba(255, 255, 255, 0.95); border: 2px solid #54a78b; color: #004b3a; .toast-icon svg { stroke: #54a78b; } }
+  &.error { background-color: rgba(255, 255, 255, 0.95); border: 2px solid #e74c3c; color: #c0392b; .toast-icon svg { stroke: #e74c3c; } }
+}
 
-  &.error {
-    background-color: rgba(255, 255, 255, 0.95);
-    border: 2px solid #e74c3c;
-    color: #c0392b;
-    .toast-icon svg { stroke: #e74c3c; }
-  }
-}
-.enterprise-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  animation: fadeIn 0.5s ease-out;
-}
+/* Sección Enterprise */
+.enterprise-section { display: flex; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.5s ease-out; }
 
 .reports-grid {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin-top: 40px;
-  flex-wrap: wrap;
-  max-width: 1000px;
+  display: flex; justify-content: center; gap: 30px; margin-top: 40px; flex-wrap: wrap; max-width: 1000px;
 
   .report-btn {
-    background: rgba(255, 255, 255, 0.6);
-    border: 2px solid #54a78b;
-    border-radius: 30px;
-    width: 250px;
-    height: 220px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 10px 20px rgba(84, 167, 139, 0.15);
+    background: rgba(255, 255, 255, 0.6); border: 2px solid #54a78b; border-radius: 30px; width: 250px; height: 220px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 10px 20px rgba(84, 167, 139, 0.15);
+    .btn-icon { font-size: 60px; margin-bottom: 20px; transition: transform 0.3s ease; }
+    span { font-family: 'Rubik', sans-serif; font-size: 20px; color: #004b3a; text-align: center; padding: 0 20px; font-weight: 500; }
 
-    .btn-icon {
-      font-size: 60px;
-      margin-bottom: 20px;
-      transition: transform 0.3s ease;
-    }
-
-    span {
-      font-family: 'Rubik', sans-serif;
-      font-size: 20px;
-      color: #004b3a;
-      text-align: center;
-      padding: 0 20px;
-      font-weight: 500;
-    }
-
-    &:hover {
-      transform: translateY(-10px);
-      background: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 15px 30px rgba(84, 167, 139, 0.3);
-      border-color: #004b3a;
-
-      .btn-icon {
-        transform: scale(1.2);
-      }
-    }
-
-    &:active {
-      transform: translateY(-5px);
-    }
+    &:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.95); box-shadow: 0 15px 30px rgba(84, 167, 139, 0.3); border-color: #004b3a; .btn-icon { transform: scale(1.2); } }
+    &:active { transform: translateY(-5px); }
   }
 }
 
-// Ajuste responsive para móviles
-@media (max-width: 768px) {
-  .reports-grid {
-    flex-direction: column;
-    align-items: center;
-
-    .report-btn {
-      width: 90%;
-      height: 150px;
-      flex-direction: row;
-      gap: 20px;
-
-      .btn-icon {
-        margin-bottom: 0;
-        font-size: 40px;
-      }
-    }
-  }
-}
-
-/* Estilos de Modales de Bloqueo */
-.modal-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6); z-index: 3000;
-  display: flex; justify-content: center; align-items: center;
-  backdrop-filter: blur(4px); animation: fadeIn 0.3s;
-}
-
+/* Modales de Bloqueo y Límite */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); animation: fadeIn 0.3s; }
 .modal-container {
-  background: white; padding: 35px; border-radius: 25px; text-align: center;
-  max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  animation: slideUp 0.3s;
-
+  background: white; padding: 35px; border-radius: 25px; text-align: center; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.3s;
   .modal-icon { font-size: 40px; margin-bottom: 15px; }
-
   h3 { color: #004b3a; margin: 0 0 10px; font-family: 'Rubik', sans-serif; font-size: 24px; }
-
   p { color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 30px; }
-
   .modal-actions {
     display: flex; justify-content: center; gap: 15px;
-
-    button, a {
-      padding: 12px 25px; border-radius: 50px; text-decoration: none;
-      font-weight: 600; cursor: pointer; border: none; font-size: 15px;
-      font-family: 'Poppins', sans-serif; transition: transform 0.2s;
-      display: inline-block;
-
-      &:active { transform: scale(0.95); }
-    }
-
-    .cancel-btn {
-      background: #f0f0f0; color: #666;
-      &:hover { background: #e0e0e0; }
-    }
-
-    .confirm-btn {
-      background: #54a78b; color: white;
-      &:hover { background: #4a9479; }
-
-      &.special {
-        background: linear-gradient(135deg, #004b3a, #54a78b);
-        box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
-      }
-    }
+    button, a { padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 600; cursor: pointer; border: none; font-size: 15px; font-family: 'Poppins', sans-serif; transition: transform 0.2s; display: inline-block; &:active { transform: scale(0.95); } }
+    .cancel-btn { background: #f0f0f0; color: #666; &:hover { background: #e0e0e0; } }
+    .confirm-btn { background: #54a78b; color: white; &:hover { background: #4a9479; } &.special { background: linear-gradient(135deg, #004b3a, #54a78b); box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3); } }
   }
 }
+
 .spinner {
   margin: 0 auto 20px; // Centrado y separado del texto
   width: 50px;
@@ -810,65 +759,7 @@
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
-/* Estilos para el estado de carga del botón */
-.search-button {
-  position: relative; /* Necesario para posicionar el tooltip */
-
-  &:disabled {
-    background-color: #b0bec5 !important; /* Gris claro */
-    cursor: not-allowed;
-    transform: none !important; /* Quita el efecto de movimiento */
-    box-shadow: none;
-
-    /* Si hay una imagen (logo), la ponemos en escala de grises y un poco transparente */
-    .search-button-icon {
-      filter: grayscale(100%) opacity(0.7);
-    }
-  }
-
-  /* El Tooltip (Mensaje flotante) */
-  .loading-tooltip {
-    position: absolute;
-    bottom: 120%; /* Aparece encima del botón */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
-    pointer-events: none; /* Para que no interfiera con el click */
-    z-index: 10;
-
-    /* Triangulito decorativo */
-    &::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: #333 transparent transparent transparent;
-    }
-  }
-
-  /* Mostrar tooltip SOLO si el botón está deshabilitado (loading) y pasamos el mouse */
-  &:disabled:hover .loading-tooltip {
-    opacity: 1;
-    visibility: visible;
-    bottom: 130%; /* Pequeña animación hacia arriba */
-  }
-}
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
-@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }

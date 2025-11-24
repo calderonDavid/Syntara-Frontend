@@ -43,7 +43,15 @@ export class AppComponent {
   getRouteAnimationData() {
     return this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'];
   }
-
+  goHome() {
+    // Si ya estamos en el home, recargamos para limpiar la búsqueda
+    if (this.router.url === '/') {
+      window.location.reload();
+    } else {
+      // Si estamos en otra página, navegamos al home
+      this.router.navigate(['/']);
+    }
+  }
   // SALIR DE LA SESIÓN
   logout() {
     this.isLoading = true;

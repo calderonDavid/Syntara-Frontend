@@ -1,18 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {Router, RouterLink, RouterModule} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { SearchResult } from '../search.service';
 import { ApiService } from '../api.service';
 import { trigger, style, transition, animate, query, stagger } from '@angular/animations';
 import { TypewriterDirective } from '../typewriter.directive';
-
-interface VolumeItem {
-  product: string;
-  quantity: number;
-  unit: string;
-}
 
 @Component({
   selector: 'app-home',
@@ -21,7 +15,6 @@ interface VolumeItem {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   animations: [
-    // Animación de la lista de resultados
     trigger('listAnimation', [
       transition('* => *', [
         query(':enter', [
@@ -33,7 +26,6 @@ interface VolumeItem {
         ], { optional: true })
       ])
     ]),
-    // NUEVA ANIMACIÓN PARA LA NOTIFICACIÓN FLOTANTE (TOAST)
     trigger('toastAnimation', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translate(-50%, 20px)' }),
@@ -47,6 +39,7 @@ interface VolumeItem {
 })
 export class HomeComponent implements OnInit {
 
+  // ... Variables de búsqueda existentes ...
   searchQuery: string = '';
   quantity: number | null = 1;
   measure: string = '';
@@ -55,21 +48,30 @@ export class HomeComponent implements OnInit {
   lastSearchMeasure: string = '';
   hasSearched: boolean = false;
   isLoading: boolean = false;
+
+  // Resultados
   results: (SearchResult & { measureLabel: string })[] = [];
+
+  // Errores
   productError: string | null = null;
   measureError: string | null = null;
   generalError: string | null = null;
   quantityError: string | null = null;
+
+  // UI Info
   greetingName: string = '';
   resultsTitleText: string = '';
-  showGuestBlockModal: boolean = false; // Modal "Regístrate"
-  showLimitModal: boolean = false;      // Modal "Límite alcanzado"
+  showGuestBlockModal: boolean = false;
+  showLimitModal: boolean = false;
 
-  // VARIABLES PARA LA NOTIFICACIÓN (TOAST)
+  // Toast
   showToast: boolean = false;
   toastMessage: string = '';
   toastType: 'success' | 'error' = 'success';
-  isEnterpriseUser: boolean = false;
+
+  // --- PERMISOS DE USUARIO ---
+  isEnterpriseUser: boolean = false; // Para vista Enterprise completa
+  hasProFeatures: boolean = false;   // Para ver detalles (Pro + Enterprise)
 
   constructor(
     private authService: AuthService,
@@ -83,27 +85,34 @@ export class HomeComponent implements OnInit {
     });
     this.checkUserPlan();
   }
+
   checkUserPlan() {
     if (this.authService.isLoggedIn()) {
       this.apiService.getMyPlan().subscribe({
         next: (plan) => {
           console.log('Plan actual:', plan);
-          // El backend devuelve el objeto suscripción. Verificamos el tipo.
-          if (plan && plan.type === 'Enterprise') {
-            this.isEnterpriseUser = true;
+
+          // Verificar Enterprise (Vista especial)
+          this.isEnterpriseUser = (plan && plan.type === 'Enterprise');
+
+          // Verificar ProFeatures (Para ver columna detalles)
+          // Tanto Pro como Enterprise pueden ver detalles
+          if (plan && (plan.type === 'Pro' || plan.type === 'Enterprise')) {
+            this.hasProFeatures = true;
           } else {
-            this.isEnterpriseUser = false;
+            this.hasProFeatures = false;
           }
         },
         error: (err) => {
           console.error('Error verificando plan', err);
-          this.isEnterpriseUser = false; // Por defecto mostramos la búsqueda normal
+          this.isEnterpriseUser = false;
+          this.hasProFeatures = false;
         }
       });
     }
   }
+
   preventInvalidCharacters(event: KeyboardEvent): void {
-    // Bloqueamos el signo menos (-), mas (+), y la 'e' (exponente)
     if (['-', '+', 'e', 'E'].includes(event.key)) {
       event.preventDefault();
     }
@@ -122,16 +131,11 @@ export class HomeComponent implements OnInit {
     if (this.productError || this.measureError) return;
 
     if (!this.authService.isLoggedIn()) {
-      // Revisamos si ya usó su búsqueda gratis
       const guestSearches = Number(localStorage.getItem('syntara_guest_searches') || 0);
-
       if (guestSearches >= 1) {
-        // Ya gastó su oportunidad -> Bloqueo
         this.showGuestBlockModal = true;
         return;
       }
-
-      // Si es la primera, la contamos y lo dejamos pasar
       localStorage.setItem('syntara_guest_searches', (guestSearches + 1).toString());
     }
 
@@ -148,7 +152,12 @@ export class HomeComponent implements OnInit {
           const payload = response.data || response;
           const resultsArray = payload.results || [];
           const shortMeasure = this.getMeasureAbbreviation(this.lastSearchMeasure);
-          this.results = resultsArray.map((result: any) => ({ ...result, measureLabel: shortMeasure }));
+
+          this.results = resultsArray.map((result: any) => ({
+            ...result,
+            measureLabel: shortMeasure
+          }));
+
           this.results.sort((a: any, b: any) => a.price - b.price);
           this.searchQuery = '';
           this.quantity = 1;
@@ -159,9 +168,7 @@ export class HomeComponent implements OnInit {
           this.isLoading = false;
           console.error('Error en búsqueda:', err);
 
-          // --- REGLA 2: LÍMITE DE 3 BÚSQUEDAS (Status 403) ---
           if (err.status === 403) {
-            // El backend dijo "Límite alcanzado"
             this.showLimitModal = true;
           } else {
             this.generalError = 'Ocurrió un error al conectar con el servidor.';
@@ -169,12 +176,9 @@ export class HomeComponent implements OnInit {
         }
       });
   }
-  closeGuestModal() {
-    this.showGuestBlockModal = false;
-  }
-  closeLimitModal() {
-    this.showLimitModal = false;
-  }
+
+  closeGuestModal() { this.showGuestBlockModal = false; }
+  closeLimitModal() { this.showLimitModal = false; }
 
   addToCart(item: any) {
     if (!this.authService.isLoggedIn()) {
@@ -200,9 +204,6 @@ export class HomeComponent implements OnInit {
       unit: this.lastSearchMeasure || 'unidad'
     };
 
-    console.log("🚀 Enviando payload limpio:", cartItemPayload);
-
-
     this.apiService.addToCart(cartItemPayload).subscribe({
       next: (res) => {
         this.showNotification(`¡${item.product} agregado al carrito!`, 'success');
@@ -210,22 +211,18 @@ export class HomeComponent implements OnInit {
       error: (err) => {
         console.error("❌ Error del servidor:", err);
         let msg = 'No se pudo agregar el producto.';
-        if (err.status === 400) msg = 'Error de validación: Revisa los datos del producto.';
+        if (err.status === 400) msg = 'Error de validación.';
         if (err.status === 401) msg = 'Sesión expirada.';
         this.showNotification(msg, 'error');
       }
     });
   }
 
-
   private showNotification(message: string, type: 'success' | 'error') {
     this.toastMessage = message;
     this.toastType = type;
     this.showToast = true;
-
-    setTimeout(() => {
-      this.showToast = false;
-    }, 3000);
+    setTimeout(() => { this.showToast = false; }, 3000);
   }
 
   private getMeasureAbbreviation(fullMeasure: string): string {
@@ -237,5 +234,12 @@ export class HomeComponent implements OnInit {
       'metros': 'm', 'centimetros': 'cm', 'metros_cuadrados': 'm²'
     };
     return map[fullMeasure] || fullMeasure;
+  }
+
+  // Helper para mostrar info segura en el popover
+  getDetailsContent(item: SearchResult): string {
+    if (item.productDetails) return item.productDetails;
+    if (item.raw && item.raw.notes) return item.raw.notes;
+    return 'Información técnica verificada por Syntara AI.';
   }
 }
