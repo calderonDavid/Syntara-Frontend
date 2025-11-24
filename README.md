@@ -43,7 +43,14 @@ Sigue estos pasos para ejecutar la aplicación en un entorno local:
 
 4.  **Visualizar:**
     Navega a `http://localhost:4200/` en tu navegador. La aplicación se recargará automáticamente si cambias algún archivo fuente.
+5.  **Conexión con Backend:**
+    En la seccion carpeta
+    ```bash
+    \syntara-frontend-master\syntara-frontend-master\src\app\api.service.ts
+    ```
+    Modifica la ip-back por la ip de la maquina que tenga contenido el Backend y el port un puerto libre tanto de la maquina con el Frontend y la del Backend
 
+    
 Backend: https://github.com/sophieMjs/syntara-backend/tree/master
 
 Database: https://github.com/calderonDavid/Base-de-Datos-MongoDB-Syntara/tree/main 
